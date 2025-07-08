@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  /* ==== Màu chủ đạo ==== */
+  --color-primary-darker: #133e87;
+  --color-primary: #088395;
+  --color-primary-light: #35a29f;
+  --color-primary-darker-dark: #4d88ff;
+  --color-primary-dark: #22c9dc;
+  --color-primary-light-dark: #75e0da;
+
+  /* ==== Màu trạng thái ==== */
+  --color-success: #198754;
+  --color-info: #1987f4;
+  --color-warning: #ffc107;
+  --color-danger: #dc3545;
+  --color-success-dark: #34d399;
+  --color-info-dark: #60a5fa;
+  --color-warning-dark: #fbbf24;
+  --color-danger-dark: #f87171;
+
+  /* ==== Màu nền ==== */
+  --color-background: #f3f3e0;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #cbdceb;
+  --color-background-dark: #121212;
+  --color-surface-dark: #1e1e1e;
+  --color-surface-subtle-dark: #2a2f38;
+
+  /* ==== Màu văn bản ==== */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #4d4d4d;
+  --color-text-muted: #6c757d;
+  --color-disabled: #ced4da;
+  --color-text-primary-dark: #f5f5f5;
+  --color-text-secondary-dark: #c4c4c4;
+  --color-text-muted-dark: #a1a1aa;
+  --color-disabled-dark: #52525b;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+  }
+
+  .dark body {
+    background-color: var(--color-background-dark);
+    color: var(--color-text-primary-dark);
+  }
+}
+
+@layer components {
+  .button {
+    @apply w-full py-3 px-6 rounded-xl font-semibold bg-primary text-white hover:bg-primary-darker dark:bg-primary-dark dark:hover:bg-primary-darker-dark transition-all cursor-pointer;
+  }
+
+  .outline-button {
+    @apply w-full py-3 px-6 rounded-xl font-semibold border-1 border-primary dark:border-primary-dark bg-none hover:border-primary-darker text-primary dark:text-primary-dark hover:text-primary-darker dark:hover:text-primary-darker-dark dark:hover:border-primary-darker transition-all cursor-pointer;
+  }
+
+  .input {
+    @apply w-full py-2.5 bg-background dark:bg-background-dark rounded-lg px-5 focus:outline-none
+  }
+  
+  .title {
+    @apply text-3xl font-bold text-text-primary dark:text-text-primary-dark
+  }
+}
