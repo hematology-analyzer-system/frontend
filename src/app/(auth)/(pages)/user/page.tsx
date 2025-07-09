@@ -1,16 +1,22 @@
+"use client";
+
 import { useState } from "react";
-import AuthForm from "../components/AuthForm";
+import AuthForm from "../../components/AuthForm";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import WomanDoctor from "@/assets/images/FemaleDoctor.png"
 
 export default function UserAuthPage() {
     const [isSignIn, setIsSignIn] = useState(true);
 
-    const handleToggle = () => setIsSignIn((prev) => !prev);
+    const handleToggle = () => {
+        setIsSignIn((prev) => !prev);
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background dark:bg-background-dark transition-colors p-5 lg:p-0">
             <div
-                className={`relative grid grid-cols-1 lg:grid-cols-2 gap-5 justify-items-center h-auto min-h-[450px] bg-surface dark:bg-surface-dark rounded-2xl shadow-xl w-full max-w-5xl overflow-hidden`}
+                className={`relative grid grid-cols-1 lg:grid-cols-2 gap-5 justify-items-center items-center h-auto min-h-[450px] bg-surface dark:bg-surface-dark rounded-2xl shadow-xl w-full max-w-5xl overflow-hidden`}
             >
                 {/* Decorator (trái nếu Sign Up, phải nếu Sign In) */}
                 <motion.div
@@ -28,6 +34,9 @@ export default function UserAuthPage() {
                     <h1 className="title text-text-primary-dark text-4xl">
                         {isSignIn ? "Hello user!" : "Welcome back!"}
                     </h1>
+
+                    <Image src={WomanDoctor} alt="Women Doctor" className="aspect-auto w-3/4 self-center hover:translate-1 hover:-rotate-z-3 hover:rotate-y-10 transition-all duration-300 ease-in-out cursor-grab" />
+
                     <p className="text-md text-text-primary-dark">
                         {isSignIn
                             ? "Don't have an account? Sign up to get full access."
@@ -49,9 +58,9 @@ export default function UserAuthPage() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: isSignIn ? 50 : -50 }}
                     transition={{ duration: 0.5 }}
-                    className={`relative w-full max-w-md py-10 px-5 lg:px-15 ${isSignIn ? "order-1" : "order-2" }`}
+                    className={`relative w-full max-w-md py-10 px-5 lg:px-15 ${isSignIn ? "order-1" : "order-2"}`}
                 >
-                    <AuthForm formName={isSignIn ? "Sign In" : "Sign Up"} isAdmin={false}/>
+                    <AuthForm formName={isSignIn ? "Sign In" : "Sign Up"} isAdmin={false} />
                 </motion.div>
             </div>
         </div>
