@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Patient } from "@/type/Patient";
-import { PencilIcon } from "@heroicons/react/24/outline";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+
 
 export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
   const [formData, setFormData] = useState(patient);
@@ -73,6 +74,25 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
     }
   };
 
+  const handleDelete = async () => {
+  const confirmed = confirm("Are you sure you want to delete this patient?");
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`http://localhost:8081/patient/patients/${patient.id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Failed to delete");
+    alert("Patient deleted successfully.");
+    window.location.href = "/patients"; // 👈 Redirect to list page or home
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete patient.");
+  }
+};
+
+
 const renderField = (
   label: string,
   field: keyof Patient,
@@ -140,7 +160,7 @@ const renderField = (
         {renderField("Created At", "createdAt")}
       </div>
 
-      {edited && (
+      {/* {edited && (
         <div className="text-right pt-4">
           <button
             onClick={handleSave}
@@ -149,7 +169,27 @@ const renderField = (
             Save Changes
           </button>
         </div>
-      )}
+      )} */}
+
+      <div className="flex justify-between pt-4">
+        <button
+          onClick={handleDelete}
+          className="inline-flex items-center space-x-2 bg-red-500 text-white font-medium px-5 py-2 rounded-full shadow hover:bg-red-600 transition"
+        >
+          <TrashIcon className="h-5 w-5" / >
+          Delete Patient
+        </button>
+
+        {edited && (
+          <button
+            onClick={handleSave}
+            className="bg-blue-600 text-white font-medium px-5 py-2 rounded-full shadow hover:bg-blue-700 transition"
+          >
+            Save Changes
+          </button>
+        )}
+      </div>
+
     </div>
   );
 };
