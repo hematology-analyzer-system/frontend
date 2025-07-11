@@ -86,8 +86,30 @@ export default function LoginPage() { // Changed component name and export
 
         console.log(response);
 
-        router.push("/patients/1");
+        
+        const response2 = await fetch('http://localhost:8080/iam/auth/me', {
+          method: 'POST',
+          headers : {
+            'Content-Type' : 'application/json',
+          },
+          credentials : 'include',
+          body : JSON.stringify(form),
+        })
+
+        const roleData = await response2.json();
+        if (response2.ok) {
+          localStorage.setItem("status", roleData.status);
+          localStorage.setItem("roles", JSON.stringify(roleData.roles));
+          localStorage.setItem("privilege_ids", JSON.stringify(roleData.privilege_ids));
+        } else {
+          console.error("Failed to fetch role info", roleData);
+        }
+
+        router.push("/patients/3");
+        console.log(roleData);
         console.log('Login successful!');
+        
+
       } else {
         setError(data.message || 'Invalid credentials or unverified email.'); // Updated error message
         console.error('Login failed:', data);

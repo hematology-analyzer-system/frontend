@@ -1,20 +1,17 @@
-// components/Navbar.tsx
-'use client';
+"use client";
+import { UserCircleIcon } from "@heroicons/react/24/solid";
 
-import { useAuth } from '@/context/AuthContext';
-
-const Navbar = () => {
-  const { fullName } = useAuth();
-
+export const Navbar = () => {
   return (
-    <header className="w-full bg-gray-50 border-b px-6 py-3 flex justify-between items-center">
-      <h1 className="font-medium text-gray-700">Healthcare Services System</h1>
-      <div className="flex items-center gap-2 text-sm text-gray-600">
-        <span>{fullName}</span>
-        <div className="w-8 h-8 bg-black rounded-full" />
+    <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
+      <div>
+        <span className="text-sm text-gray-500">Healthcare Services System</span>
+        <h1 className="text-lg font-bold">Group 2</h1>
       </div>
-    </header>
+      <div className="flex items-center space-x-2">
+        <UserCircleIcon className="h-6 w-6 text-black" />
+        <span className="text-sm font-medium">Nguyen Huu Thanh</span>
+      </div>
+    </div>
   );
 };
-
-export default Navbar;

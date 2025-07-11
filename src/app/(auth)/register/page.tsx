@@ -45,6 +45,8 @@ export default function RegisterPage() {
       return;
     }
 
+    console.log(form);
+
     try {
       const res = await fetch("http://localhost:8080/iam/auth/register", {
         method: "POST",
@@ -54,8 +56,8 @@ export default function RegisterPage() {
       });
 
       if (res.ok) {
-        alert("Check your email for verification!");
-        router.push("/auth/login");
+        // alert("Check your email for verification!");
+        router.push("/login");
       } else {
         // 2. Server-side validation: Handle duplicates
         const errorData = await res.json();

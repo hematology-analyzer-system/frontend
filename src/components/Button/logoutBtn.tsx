@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
 const LogoutButton = () => {
@@ -12,8 +12,11 @@ const LogoutButton = () => {
       method: "POST",
       credentials: "include",
     });
+    localStorage.clear();
 
     router.push("/login");
+    window.location.reload();
+    // redirect("/login");
   };
 
   return (
