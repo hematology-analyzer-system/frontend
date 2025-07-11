@@ -1,4 +1,5 @@
-import { Sidebar } from "./Sidebar";
+// import { Sidebar } from "./Sidebar";
+import { Sidebar } from "./sidebar/Sidebar";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 

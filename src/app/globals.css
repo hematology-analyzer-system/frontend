@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Calistoga&family=Imprima&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -36,6 +37,12 @@
   --color-text-secondary-dark: #c4c4c4;
   --color-text-muted-dark: #a1a1aa;
   --color-disabled-dark: #52525b;
+}
+
+.calistoga-regular {
+  font-family: "Calistoga", serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 @layer base {

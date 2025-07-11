@@ -1,10 +1,10 @@
 import React from "react";
-import AppLayout from "@/components/Layout/AppLayout";
+import AppLayoutSearch from "@/components/Layout/AppLayoutSearch";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <AppLayout>{children}</AppLayout>
+        <AppLayoutSearch>{children}</AppLayoutSearch>
       </body>
     </html>
   );
