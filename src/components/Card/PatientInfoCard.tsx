@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Patient } from "@/type/Patient";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import LogoutButton from "../Button/logoutBtn";
 
 
 export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
@@ -179,6 +180,8 @@ const renderField = (
           <TrashIcon className="h-5 w-5" / >
           Delete Patient
         </button>
+
+        <LogoutButton></LogoutButton>
 
         {edited && (
           <button

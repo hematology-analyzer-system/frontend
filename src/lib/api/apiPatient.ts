@@ -3,7 +3,7 @@ import { Patient } from '@/type/Patient';
 
 const apiPatient = axios.create({
   baseURL : "http://localhost:8081/patient",
-  withCredentials : false
+  withCredentials : true
 });
 
 export default apiPatient;

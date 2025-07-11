@@ -1,5 +1,7 @@
 "use client";
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import machineImage from "@/assets/images/DxH900.png";

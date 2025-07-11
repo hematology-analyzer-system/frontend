@@ -2,9 +2,9 @@ import { Metadata } from 'next'
 import { Montserrat } from "next/font/google";
 import './globals.css'
 import { AuthProvider } from '@/context/AuthContext';
-import Sidebar from '@/components/Sidebar';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Sidebar from '@/components/Layout/Sidebar';
+import Navbar from '@/components/Layout/Navbar';
+import Footer from '@/components/Layout/Footer';
 
 
 const montserrat = Montserrat({
