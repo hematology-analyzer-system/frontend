@@ -1,12 +1,15 @@
+// src/app/(iam)/users/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter
 import UserCard from '@/components/Card/UserCard';
 import Pagination from '@/components/Pagination/Pagination';
 import SearchFilterBar from '@/components/Layout/SearchFilterBar'; 
 import { UserResponseDTO, PageResponse } from '@/type/user';
 
 export default function UsersPage() {
+  const router = useRouter(); // Initialize useRouter
   const [users, setUsers] = useState<UserResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +36,7 @@ export default function UsersPage() {
       searchText: searchText || '',
       sortBy: sortBy,
       direction: direction,
+      // Reverting to your original logic: currentPage.toString()
       offsetPage: currentPage.toString(), 
       limitOnePage: limitOnePage.toString(),
       ...(selectedRole && { role: selectedRole }),
@@ -94,16 +98,51 @@ export default function UsersPage() {
     }
   };
 
-  const handleViewUser = (userId: number) => { /* implementation */ };
-  const handleEditUser = (userId: number) => { /* implementation */ };
-  const handleDeleteUser = (userId: number) => { /* implementation */ };
+  // --- Implementation for 'View' button to navigate ---
+  const handleViewUser = (userId: number) => {
+    // Navigate to the user details page using Next.js router
+    router.push(`/iam/users/${userId}`); 
+  };
+
+  // --- Implementations for 'Edit' and 'Delete' buttons ---
+  const handleEditUser = (userId: number) => {
+    console.log(`Edit user with ID: ${userId}`);
+    // You could navigate to the same details page with an edit mode flag, e.g.:
+    router.push(`/iam/users/${userId}?mode=edit`);
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    if (!window.confirm(`Are you sure you want to delete user with ID: ${userId}?`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await fetch(`http://localhost:8080/iam/users/${userId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to delete user');
+      }
+
+      // Re-fetch users to update the list after deletion
+      fetchUsers(); 
+      alert('User deleted successfully!');
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      setError(err instanceof Error ? err.message : 'Failed to delete user.');
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-sm text-gray-500 mb-4">IAM / Users</div>
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Users Management</h1>
 
-      {/* Using the modified SearchFilterBar component */}
       <SearchFilterBar
         searchText={searchText}
         onSearchChange={handleSearchChange}
@@ -115,8 +154,11 @@ export default function UsersPage() {
         onSortChange={handleSortChange}
       />
 
-      {/* ... Loading, Error, and Empty state display ... */}
-
+      {loading && <div className="text-center py-8 text-blue-500">Loading users...</div>}
+      {error && <div className="text-center py-8 text-red-500">Error: {error}</div>}
+      {!loading && !error && users.length === 0 && (
+        <div className="text-center py-8 text-gray-500">No users found.</div>
+      )}
 
       {!loading && !error && users.length > 0 && (
         <>
@@ -125,8 +167,8 @@ export default function UsersPage() {
               <UserCard 
                 key={user.id} 
                 user={user} 
-                onView={handleViewUser}
-                onEdit={handleEditUser}
+                onView={handleViewUser} // This will now navigate
+                onEdit={handleEditUser} // This will also navigate (optional edit mode)
                 onDelete={handleDeleteUser}
               />
             ))}

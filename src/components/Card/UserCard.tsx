@@ -6,15 +6,15 @@ import { EyeIcon, PencilIcon, TrashIcon, EllipsisVerticalIcon } from '@heroicons
 interface UserCardProps {
   user: UserResponseDTO;
   // Define action handlers passed down from the parent component
-  onView: (id: number) => void;
+  onView: (id: number) => void; // This is the handler for viewing
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
 }
 
 const UserCard: React.FC<UserCardProps> = ({ user, onView, onEdit, onDelete }) => {
   // Determine the primary role for display (e.g., the first role or 'N/A')
-  const displayRole = user.roles && user.roles.length > 0 ? user.roles[0] : 'N/A Role';
-
+  // const displayRole = user.roles && user.roles.length > 0 ? user.roles[0] : 'N/A Role';
+const displayRole = user.roles && user.roles.length > 0 ? user.roles[0].name : 'N/A Role';
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col items-center text-center transition-transform duration-200 hover:scale-[1.02] border border-gray-100 relative">
       
@@ -29,7 +29,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onView, onEdit, onDelete }) =
           {/* Dropdown Menu for Actions (Hidden by default, shown on group hover) */}
           <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition duration-200 ease-in-out transform scale-95 group-hover:scale-100 z-10 origin-top-right">
             <button 
-              onClick={() => onView(user.id)} 
+              onClick={() => onView(user.id)} // This calls the onView function passed from the parent
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-md"
             >
               <EyeIcon className="h-4 w-4 mr-2 text-blue-500" /> View
@@ -59,13 +59,13 @@ const UserCard: React.FC<UserCardProps> = ({ user, onView, onEdit, onDelete }) =
         />
       </div>
 
-      {/* Name and Role */}
+      {/* Name, Role, Email, and Status */}
       <h3 className="text-lg font-semibold text-gray-800 mb-1">{user.fullName}</h3>
-      <p className="text-sm text-gray-500 mb-4">{displayRole}</p>
-
-
-
-
+      <p className="text-sm text-gray-500 mb-1">{displayRole}</p>
+      <p className="text-sm text-gray-500 mb-1">{user.email}</p>
+      <p className={`text-sm font-medium ${user.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}>
+        {user.status}
+      </p>
     </div>
   );
 };

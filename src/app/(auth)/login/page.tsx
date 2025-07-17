@@ -105,7 +105,7 @@ export default function LoginPage() { // Changed component name and export
           console.error("Failed to fetch role info", roleData);
         }
 
-        router.push("/patients/3");
+        router.push("/iam/users");
         console.log(roleData);
         console.log('Login successful!');
         
