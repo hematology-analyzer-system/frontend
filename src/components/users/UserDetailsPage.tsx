@@ -87,18 +87,6 @@ const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCance
 
 
   const handleSave = () => {
-    // Before saving, you might need to adjust formData.roles based on your backend's expectation for PUT/PATCH.
-    // If your backend expects only role IDs or role names, you'll need to map `formData.roles`
-    // For example, to send only role IDs:
-    // const rolesForBackend = formData.roles.map(role => ({ roleId: role.roleId }));
-    // onSave({ ...formData, roles: rolesForBackend });
-    // Or if it expects just an array of names:
-    // const roleNamesForBackend = formData.roles.map(role => role.name);
-    // onSave({ ...formData, roles: roleNamesForBackend }); // This would require UserResponseDTO.roles to be string[] again
-
-    // Assuming your backend's PUT/PATCH endpoint for User can handle a list of RoleResponseDTO objects
-    // or at least objects with `roleId` and `name` for identification.
-    // If not, simplify `formData.roles` before passing to `onSave`.
     onSave(formData);
   };
 

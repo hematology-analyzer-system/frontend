@@ -1,12 +1,14 @@
 "use client";
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import apiIAM from '@/lib/api/apiIAM';
 
 const LogoutPage = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
     // 1. Call the logout API endpoint
+    // await apiIAM.post('auth/logout')
     await fetch("http://localhost:8080/iam/auth/logout", {
       method: "POST",
       credentials: "include", 

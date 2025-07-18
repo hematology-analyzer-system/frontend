@@ -44,15 +44,40 @@ export default function UsersPage() {
     });
 
     try {
-      const res = await fetch(`http://localhost:8080/iam/users/filter?${params.toString()}`, {
+      const url = `http://localhost:8080/iam/users/filter?${params.toString()}`;
+      console.log("fetching: ", url);
+      const options :RequestInit = {
         method: 'GET',
         credentials: 'include',
-      });
+      };
+
+      console.log("Fetch options: ", options);
+      const res = await fetch(url, options);
+      // const res = await fetch(`http://localhost:8080/iam/users/filter?${params.toString()}`, {
+      //   method: 'GET',
+      //   credentials: 'include',
+      // });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to fetch users');
+        let errorMessage = 'Failed to fetch users';
+
+        try {
+          const contentType = res.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const errorData = await res.json();
+            errorMessage = errorData.message || errorMessage;
+          } else {
+            // Try to read plain text fallback
+            const errorText = await res.text();
+            errorMessage = errorText || errorMessage;
+          }
+        } catch (e) {
+          console.warn("Error parsing error response:", e);
+        }
+
+        throw new Error(errorMessage);
       }
+
 
       const data: PageResponse<UserResponseDTO> = await res.json();
       

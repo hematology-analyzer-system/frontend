@@ -182,7 +182,7 @@ export default function RolesPage() {
     setLoading(true);
     try {
       const method = roleData.roleId === 0 ? 'POST' : 'PUT';
-      const url = roleData.roleId === 0 ? 'http://localhost:8080/roles' : `http://localhost:8080/roles/${roleData.roleId}`;
+      const url = roleData.roleId === 0 ? 'http://localhost:8080/iam/roles' : `http://localhost:8080/iam/roles/${roleData.roleId}`;
 
       const privilegesForBackend = roleData.privileges.map(p => ({ privilegeId: p.privilegeId }));
 
