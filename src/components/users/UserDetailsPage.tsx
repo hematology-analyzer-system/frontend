@@ -23,16 +23,27 @@ interface UserDetailsPageProps {
 
 const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCancel }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<UserResponseDTO>(user);
+  // const [formData, setFormData] = useState<UserResponseDTO>(user);
+  const [formData, setFormData] = useState<UserResponseDTO>({
+  ...user,
+  roles: user.roles ?? [],
+});
   const [allRoles, setAllRoles] = useState<RoleResponseDTO[]>([]); // State to store all roles for dropdown
   const [rolesLoading, setRolesLoading] = useState(true);
   const [rolesError, setRolesError] = useState<string | null>(null);
 
   // Effect to reset form data and edit mode when a different user prop is received
+  // useEffect(() => {
+  //   setFormData(user);
+  //   setIsEditing(false); // Reset edit mode when user changes
+  // }, [user]);
   useEffect(() => {
-    setFormData(user);
-    setIsEditing(false); // Reset edit mode when user changes
-  }, [user]);
+  setFormData({
+    ...user,
+    roles: user.roles ?? [],
+  });
+  setIsEditing(false);
+}, [user]);
 
   // Fetch all roles when the component mounts
   useEffect(() => {
@@ -113,10 +124,16 @@ const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCance
   );
 
   // Derive all unique privilege codes from the user's assigned roles
-  const userPrivilegeCodes = formData.roles
-    .flatMap(role => role.privileges.map(p => p.code)) // Get all privilege codes from all assigned roles
-    .filter((value, index, self) => self.indexOf(value) === index) // Remove duplicates
-    .join(', ');
+  // const userPrivilegeCodes = formData.roles
+  //   .flatMap(role => role.privileges.map(p => p.code)) // Get all privilege codes from all assigned roles
+  //   .filter((value, index, self) => self.indexOf(value) === index) // Remove duplicates
+  //   .join(', ');
+
+  const userPrivilegeCodes = (formData.roles ?? [])
+  .flatMap(role => role.privileges?.map(p => p.code) ?? [])
+  .filter((value, index, self) => self.indexOf(value) === index)
+  .join(', ');
+
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-xl">
@@ -217,8 +234,7 @@ const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCance
               id="roles"
               name="roles"
               multiple
-              // Map currently assigned roles by their 'name' property for the select value
-              value={formData.roles.map(role => role.name)}
+              value={(formData.roles ?? []).map(role => role.name)} // Safe .map
               onChange={handleChange}
               disabled={!isEditing}
               className={`w-full mt-1 px-4 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -246,8 +262,11 @@ const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCance
         <div className="md:col-span-2 flex items-center mt-4">
           <div className="w-24 h-24 rounded-full overflow-hidden mr-4 border-4 border-blue-100 flex-shrink-0">
             <img
-              src={formData.profileImageUrl || `https://placehold.co/96x96/ADD8E6/000000?text=${formData.fullName.charAt(0)}`}
-              alt={formData.fullName}
+              src={
+                formData.profileImageUrl ||
+                `https://placehold.co/96x96/ADD8E6/000000?text=${formData.fullName?.charAt(0) ?? 'U'}`
+              }
+              alt={formData.fullName ?? 'User'}
               className="w-full h-full object-cover"
             />
           </div>
