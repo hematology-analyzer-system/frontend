@@ -11,12 +11,9 @@ interface Props {
 }
 
 export interface Comment {
-  id: number;
-  createdAt: string;
-  modifiedAt: string;
-  content: string;
-  resultId?: number;
-  testOrderId?: number;
+  content:   string;
+  createdBy: string;
+  updateBy:  string | null;
 }
 
 const BASE = process.env.NEXT_PUBLIC_API_URL
@@ -29,9 +26,10 @@ const AddResultCommentModal: FC<Props> = ({ resultId, onClose, onSaved }) => {
   const handleSave = async () => {
     if (!text.trim()) return;
     const res = await fetch(
-      `${BASE}/api/results/${resultId}/comments`,
+      `${BASE}/comment/addResult/${resultId}`,
       {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify({ content: text })
       }

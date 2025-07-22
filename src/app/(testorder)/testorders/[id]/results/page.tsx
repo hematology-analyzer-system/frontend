@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { fetchTestOrderById, TestOrderRaw, Result, BASE, Comment } from '../../fetch';
+import { fetchTestOrderById, TestOrderRaw, Result, BASE, Comment, ResultDetails } from '../../fetch';
 import AddResultCommentModal from '../../components/AddResultCommentModal';
 import Link from 'next/link';
 
@@ -12,7 +12,13 @@ export default function TestOrderResultsPage() {
   const [loading, setLoading]   = useState(true);
   const [selected, setSelected] = useState<number>(0);
   const [showAdd, setShowAdd]   = useState(false);
-
+  function extractIdNum(runBy: string | null): string | null {
+  if (!runBy) {
+    return null
+  }
+  const m = runBy.match(/Email:\s*([^|]+)/);
+  return m ? m[1] : null;
+}
   useEffect(() => {
     (async () => {
       try {
@@ -29,8 +35,8 @@ export default function TestOrderResultsPage() {
     setOrder(prev => {
       if (!prev) return prev;
       const newResults = prev.results.map(r =>
-        r.resultId === result.resultId
-          ? { ...r, comments: [...r.comments, c] }
+        r.id === result.id
+          ? { ...r, comments: [...r.comment_result, c] }
           : r
       );
       return { ...prev, results: newResults };
@@ -39,10 +45,12 @@ export default function TestOrderResultsPage() {
 
   if (loading) return <div>Loading…</div>;
   if (!order) return <div>Testorder not found</div>;
-  if (order.results.length === 0) return <div>No results available</div>;
+  if (!order.results) return <div>No results available</div>;
 
   const results = order.results;
   const result: Result  = results[selected];
+  console.log(result);
+
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -54,14 +62,14 @@ export default function TestOrderResultsPage() {
       <div className="flex space-x-2 mb-6">
         {results.map((r, idx) => (
           <button
-            key={r.resultId}
+            key={r.id}
             onClick={() => setSelected(idx)}
             className={`px-4 py-2 rounded-t-lg border
                ${selected === idx
                  ? 'bg-green-50 border-green-500 text-green-800'
                  : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-100'}`}
           >
-            Result – {r.resultId}
+            Result – {r.id}
           </button>
         ))}
       </div>
@@ -70,31 +78,33 @@ export default function TestOrderResultsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left panel: Result Detail */}
         <div className="p-6 bg-white rounded-lg border border-green-300 shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Result – {result.resultId}</h2>
+          <h2 className="text-xl font-semibold mb-4">Result – {result.id}</h2>
           <div className="overflow-auto">
             <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b">
-                  {['ParamName','Value','Unit','RangeMin','RangeMax'].map(h => (
-                    <th key={h} className="py-2 px-1 text-gray-700">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="py-2 px-1">{result.details.parameterName}</td>
-                  <td className="py-2 px-1">{result.details.value}</td>
-                  <td className="py-2 px-1">{result.details.unit}</td>
-                  <td className="py-2 px-1">{result.details.rangeMin}</td>
-                  <td className="py-2 px-1">{result.details.rangeMax}</td>
-                </tr>
-              </tbody>
-            </table>
+  <thead>
+    <tr className="border-b">
+      {['ParamName','Value','Unit','RangeMin','RangeMax'].map(h => (
+        <th key={h} className="py-2 px-1">{h}</th>
+      ))}
+    </tr>
+  </thead>
+  <tbody>
+    {result.detailResults.map((d: ResultDetails, i: number)  => (
+      <tr key={d.id} className="border-b">
+        <td className="py-2 px-1">{d.paramName}</td>
+        <td className="py-2 px-1">{d.value}</td>
+        <td className="py-2 px-1">{d.unit}</td>
+        <td className="py-2 px-1">{d.rangeMin}</td>
+        <td className="py-2 px-1">{d.rangeMax}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
           </div>
 
           {/* Buttons */}
           <div className="flex space-x-4 mt-6">
-            <Link href={`/testorder/${order.testId}/results/${result.resultId}/edit`}>
+            <Link href={`/testorder/${order.testId}/results/${result.id}/edit`}>
               <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                 Update detail
               </button>
@@ -102,7 +112,7 @@ export default function TestOrderResultsPage() {
             <button
               onClick={async () => {
                 // DELETE result
-                await fetch(`${BASE}/api/results/${result.resultId}`, { method: 'DELETE' });
+                await fetch(`${BASE}/result/${result.id}`, { method: 'DELETE',credentials: 'include' });
                 // reload page
                 setLoading(true);
                 const o2 = await fetchTestOrderById(Number(id));
@@ -114,7 +124,7 @@ export default function TestOrderResultsPage() {
             >
               Delete
             </button>
-            <Link href={`/testorder/${order.testId}/results/${result.resultId}/print`}>
+            <Link href={`/testorder/${order.testId}/results/${result.id}/print`}>
               <button className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700">
                 Print results
               </button>
@@ -126,12 +136,15 @@ export default function TestOrderResultsPage() {
         <div className="p-6 bg-white rounded-lg border border-green-300 shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Result comment</h2>
 
-          {result.comments.length === 0
+          {/* {result.comments.length === 0 */}
+          {!result.comment_result
             ? <p className="italic">No comments yet.</p>
-            : result.comments.map((c: Comment) => (
-                <div key={c.id} className="mb-4">
+            : result.comment_result.map((c: Comment) => (
+                // <div key={c.id} className="mb-4">
+                <div className="mb-4">
                   <p className="text-gray-500 text-sm">
-                    {new Date(c.createdAt).toLocaleDateString()}
+                    {/* {new Date(c.createdAt).toLocaleDateString()} */}
+                    {extractIdNum(c.createdBy)}
                   </p>
                   <p className="border-l-2 border-green-400 pl-4 italic">
                     “{c.content}”
@@ -152,7 +165,7 @@ export default function TestOrderResultsPage() {
       {/* Modal Add comment */}
       {showAdd && (
         <AddResultCommentModal
-          resultId={result.resultId}
+          resultId={result.id}
           onClose={() => setShowAdd(false)}
           onSaved={handleNewComment}
         />

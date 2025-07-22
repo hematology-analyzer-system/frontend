@@ -3,23 +3,29 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { fetchTestOrderById, fetchPatient, TestOrderRaw, TestOrder } from '../fetch';
+import { fetchTestOrderById, fetchPatient, TestOrderRaw, BASE } from '../fetch';
 import { X } from 'lucide-react';
 
 export default function TestOrderDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const [order, setOrder] = useState<TestOrder | null>(null);
+  const [order, setOrder] = useState<TestOrderRaw| null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding]     = useState(false);
   const [commentText, setText]  = useState('');
-
+  function extractIdNum(runBy: string | null): string | null {
+  if (!runBy) {
+    return null
+  }
+  const m = runBy.match(/Email:\s*([^|]+)/);
+  return m ? m[1] : null;
+}
   useEffect(() => {
     (async () => {
       try {
         const raw: TestOrderRaw = await fetchTestOrderById(Number(id));
-        const patient = await fetchPatient(raw.patientId);
-        setOrder({ ...raw, patient });
+        // const patient = await fetchPatient(raw.patientId);
+        setOrder(raw);
       } catch (e) {
         console.error(e);
       } finally {
@@ -34,17 +40,23 @@ export default function TestOrderDetailPage() {
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this testorder?')) return;
     await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder'}/api/test-orders/${order.testId}`,
-      { method: 'DELETE' }
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder'}/testorder/${order.testId}`,
+      { method: 'DELETE',
+        credentials: 'include'
+       }
     );
-    router.push('/testorder');
+    router.push('/testorders');
   };
   const handleSaveComment = async () => {
     if (!commentText.trim()) return;    // không gửi nếu rỗng
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder'}/api/test-orders/${order.testId}/comments?content=${encodeURIComponent(commentText)}`,
-        { method: 'POST' }
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder'}/comment/addTO/${order.testId}`,
+        { method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ content: commentText })
+         }
       );
       if (!res.ok) throw new Error('Error creating comment');
       const newComment = await res.json();
@@ -64,6 +76,32 @@ export default function TestOrderDetailPage() {
 
   const handleUpdate      = () => router.push(`/testorders/${order.testId}/edit`);
   const handleViewResults = () => router.push(`/testorders/${order.testId}/results`);
+  const handleGenerate = async () => {
+    try {
+      const res = await fetch(
+        `${BASE}/result/gen/${order.testId}`,
+        {
+          method: 'POST',
+          credentials: 'include', // nếu bạn dùng cookie auth
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Gen failed: ${res.status} ${text}`);
+      }
+
+      // 1) Chuyển qua trang xem kết quả
+      router.push(`/testorder/${order.testId}`);
+      // — hoặc nếu bạn chỉ muốn ở lại page detail mà reload data:
+      // router.refresh();
+
+    } catch (err) {
+      console.error(err);
+      alert('Failed to generate results: ' + (err as Error).message);
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow">
@@ -74,24 +112,32 @@ export default function TestOrderDetailPage() {
         <div className="p-6 border rounded-lg space-y-4">
           <h2 className="text-xl font-semibold text-center">Patient Information</h2>
           <div className="space-y-1">
-            <p><span className="font-bold">Full name:</span> {order.patient.fullName}</p>
-            <p><span className="font-bold">Gender:</span>    {order.patient.gender}</p>
-            <p><span className="font-bold">Age:</span>       {new Date().getFullYear() - new Date(order.patient.dateOfBirth).getFullYear()}</p>
-            <p><span className="font-bold">Phone number:</span> {order.patient.phone}</p>
-            <p><span className="font-bold">Address:</span>   {order.patient.address}</p>
-            <p><span className="font-bold">Email:</span>     {order.patient.email}</p>
+            <p><span className="font-bold">Full name:</span> {order.fullName}</p>
+            <p><span className="font-bold">Gender:</span>    {order.gender}</p>
+            <p><span className="font-bold">Age:</span>       {new Date().getFullYear() - new Date(order.dateOfBirth).getFullYear()}</p>
+            <p><span className="font-bold">Phone number:</span> {order.phone}</p>
+            <p><span className="font-bold">Address:</span>   {order.address}</p>
+            {/* <p><span className="font-bold">Email:</span>     {order.patient.email}</p> */}
           </div>
 
           <section className="text-center mb-6">
         <h2 className="text-xl font-semibold">Status</h2>
-        <p className="text-green-600 font-bold">{order.status.toLowerCase()}</p>
+        <p
+          className={`font-bold ${
+            order.status.toLowerCase() === 'completed'
+              ? 'text-green-600'
+              : 'text-orange-500'
+          }`}
+        >
+          {order.status.toLowerCase()}
+        </p>
       </section>
 
           <div className="flex justify-center space-x-4 mt-6">
-            <button
+            {/* <button
               onClick={handleUpdate}
               className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >Update detail</button>
+            >Update detail</button> */}
             {order.status === 'COMPLETED' ? (
           /* Nếu đã completed: show View Results */
           <button
@@ -103,7 +149,7 @@ export default function TestOrderDetailPage() {
         ) : (
           /* Nếu chưa completed: show Generate Results */
           <button
-            onClick={() => router.push(`/testorder/${order.testId}/results/generate`)}
+            onClick={handleGenerate}
             className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700"
           >
             Gen Results
@@ -124,9 +170,9 @@ export default function TestOrderDetailPage() {
             <p className="italic text-center">No comments yet.</p>
           ) : (
             order.comments.map(c => (
-              <div key={c.id} className="mb-6">
+              <div  className="mb-6">
                 <p className="text-gray-500 text-sm">
-                  {new Date(c.createdAt).toLocaleDateString()}
+                  "{extractIdNum(c.createdBy)}"
                 </p>
                 <p className="border-l-2 border-green-400 pl-4 italic">
                   “{c.content}”

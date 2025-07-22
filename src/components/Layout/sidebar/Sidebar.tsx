@@ -33,11 +33,11 @@ const SIDEBAR_ITEMS = {
     { href: "/patients", label: "Patients", icon: <UsersIcon className="h-5 w-5 text-gray-500" /> },
     {
       href: "#",
-      label: "Tests",
+      label: "Testorder",
       icon: <BeakerIcon className="h-5 w-5 text-gray-500" />,
       children: [
-        { href: "/tests/orders", label: "Orders", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
-        { href: "/tests/results", label: "Results", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
+        { href: "/testorders", label: "Orders", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
+        { href: "/testorderResult", label: "Results", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
       ],
     },
   ],
@@ -49,8 +49,8 @@ const SIDEBAR_ITEMS = {
       label: "Tests",
       icon: <BeakerIcon className="h-5 w-5 text-gray-500" />,
       children: [
-        { href: "/tests/orders", label: "Orders", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
-        { href: "/tests/results", label: "Results", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
+        { href: "/testorders", label: "Orders", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
+        { href: "/testorderResult", label: "Results", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
       ],
     },
   ],
@@ -62,7 +62,7 @@ const SIDEBAR_ITEMS = {
       label: "Tests",
       icon: <BeakerIcon className="h-5 w-5 text-gray-500" />,
       children: [
-        { href: "/tests/orders", label: "Orders", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
+        { href: "/testorders", label: "Orders", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
       ],
     },
   ],

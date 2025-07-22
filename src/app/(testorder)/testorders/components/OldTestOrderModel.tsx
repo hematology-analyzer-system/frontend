@@ -24,16 +24,11 @@ const OldTestOrderModal: FC<Props> = ({ onClose, onCreated }) => {
     }
 
     const res = await fetch(
-      `${BASE}/api/test-orders`,
+      `${BASE}/testorder/create/${patientId}`,
       {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          runBy:  'lab',
-          runAt:  new Date().toISOString(),
-          status: 'PENDING',
-          patient: { id: idNum }
-        })
       }
     );
     if (!res.ok) {
