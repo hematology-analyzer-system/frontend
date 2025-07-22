@@ -7,15 +7,16 @@ export interface UserResponseDTO {
   phone: string;
   gender: string;
   address: string;
-  date_of_Birth?: string;
-  status: string; // e.g., "ACTIVE", "INACTIVE"
-  create_at?: string; // from user.getCreate_at()
-  update_at?: string; // from user.getUpdate_at()
+  dateOfBirth?: string;
+  status: string; // e.g., "ACTIVE", "INACTIVE", "PENDING_VERIFICATION"
+  createdAt?: string; // from user.getCreate_at()
+  updateAt?: string; // from user.getUpdate_at()
   // roles: string[]; // Set of role names (mapped from User.getRoles())
   privileges: string[]; // Set of privilege descriptions (mapped from User.getRoles().getPrivileges())
 
   profileImageUrl?: string;
 
+  roleId ?: number[];
   roles: RoleResponseDTO[]; // Updated to be an array of RoleResponseDTO
     enabled?: boolean;
     credentialsNonExpired?: boolean;
