@@ -52,7 +52,7 @@ export default function LoginPage() {
 
         router.push('/iam/users');
       } else {
-        setError(data.message || 'Invalid credentials or unverified email.');
+        setError(data.message || 'Invalid Username or Password!');
       }
     } catch (err) {
       setError('An error occurred. Please try again later.');
@@ -90,7 +90,7 @@ export default function LoginPage() {
               <label>
                 <input type="checkbox" className="mr-1" /> Remember me
               </label>
-              <a href="#" className="hover:underline">Forgot password?</a>
+              <a href="/forgotPassword" className="hover:underline">Forgot password?</a>
             </div>
             {error && <p className="text-red-500 text-sm text-center">{error}</p>}
             <button
