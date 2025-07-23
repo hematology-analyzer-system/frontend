@@ -93,7 +93,10 @@ export default function TestOrderDetailPage() {
       }
 
       // 1) Chuyển qua trang xem kết quả
-      router.push(`/testorder/${order.testId}`);
+      
+      window.location.href = `/testorders/${order.testId}`;
+
+      
       // — hoặc nếu bạn chỉ muốn ở lại page detail mà reload data:
       // router.refresh();
 
