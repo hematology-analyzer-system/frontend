@@ -205,21 +205,22 @@ export default function TestOrderDetailPage() {
               onClick={handleUpdate}
               className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >Update detail</button> */}
-            {order.status === 'COMPLETED' ? (
+            {order.status === 'PENDING'  ? (
           /* Nếu đã completed: show View Results */
-          <button
-            onClick={handleViewResults}
-            className="px-5 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
-          >
-            View Results
-          </button>
-        ) : (
-          /* Nếu chưa completed: show Generate Results */
           <button
             onClick={handleGenerate}
             className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700"
           >
             Gen Results
+          </button>
+        ) : (
+          /* Nếu chưa completed: show Generate Results */
+          
+          <button
+            onClick={handleViewResults}
+            className="px-5 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+          >
+            View Results
           </button>
         )}
             <button
