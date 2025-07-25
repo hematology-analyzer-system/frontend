@@ -1,31 +1,27 @@
-// types/user.ts
-
 export interface UserResponseDTO {
-  id: number; // Ensure ID is included for actions
+  id: number;
   fullName: string;
   email: string;
   phone: string;
   gender: string;
   address: string;
-  dateOfBirth?: string;
-  status: string; // e.g., "ACTIVE", "INACTIVE", "PENDING_VERIFICATION"
-  createdAt?: string; // from user.getCreate_at()
-  updateAt?: string; // from user.getUpdate_at()
-  // roles: string[]; // Set of role names (mapped from User.getRoles())
-  privileges: string[]; // Set of privilege descriptions (mapped from User.getRoles().getPrivileges())
-
+  date_of_Birth?: string;
+  identifyNum: string;
+  status: string;
+  createdAt?: string;
+  updateAt?: string;
+  updated_by_email?: string;
+  privileges: string[]; // This might still be used for displaying user privileges, separate from role-specific privileges
   profileImageUrl?: string;
-
-  roleId ?: number[];
-  roles: RoleResponseDTO[]; // Updated to be an array of RoleResponseDTO
-    enabled?: boolean;
-    credentialsNonExpired?: boolean;
-    accountNonExpired?: boolean;
-    accountNonLocked?: boolean;
-    authorities?: string[]; // Assuming simple string array for authorities
+  roleIds ?: number[];
+  roles?: RoleResponseDTO[]; // This is used when fetching roles with user data, for UserDetailsPage
+  enabled?: boolean;
+  credentialsNonExpired?: boolean;
+  accountNonExpired?: boolean;
+  accountNonLocked?: boolean;
+  authorities?: string[];
 }
 
-// ... PageResponse interface remains the same
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;
@@ -49,30 +45,26 @@ export interface RoleResponseDTO {
     name: string;
     description: string;
     code: string;
-    privileges: PrivilegeResponseDTO[];
+    privileges: PrivilegeResponseDTO[]; // This should be an array of PrivilegeResponseDTO objects
     createdBy?: UserAuditInfoDTO;
     updatedBy?: UserAuditInfoDTO;
 }
 
 export interface PrivilegeResponseDTO {
     privilegeId: number;
-    code: string;
-    description: string;
+    code: string; // e.g., "VIEW_USER", "CREATE_USER"
+    description: string; // e.g., "View users", "Create user"
 }
 
 export interface RoleRequest {
   page_num: number;
   page_size: number;
-  filter?: string; // Corresponds to keyword in backend's searchRoles
-  sort?: string;   // Corresponds to sortBy in backend's searchRoles
-  // Add other fields if your backend's RoleRequest accepts them for more filters
-  // For example:
-  // roleName?: string;
-  // location?: string;
+  filter?: string;
+  sort?: string;
 }
 
 export interface PageResponseRole {
-    roles: RoleResponseDTO[]; // 🚨 Changed 'content' to 'roles'
+    roles: RoleResponseDTO[];
     totalElements: number;
     totalPages: number;
     currentPage: number;
@@ -82,7 +74,5 @@ export interface PageResponseRole {
     sortBy: string;
     sortDirection: string;
     empty: boolean;
-    message: string; // Add message if present in backend response
-    // Remove 'content' if it's not actually present
-    // content: T[]; // Remove this line if 'roles' is the actual array field
+    message: string;
 }

@@ -1,16 +1,15 @@
-// src/app/(iam)/roles/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
 import RoleCard from '@/components/Card/RoleCard';
-import RoleForm from '@/components/Form/RoleForm';
+import RoleForm from '@/components/Form/RoleForm'; // Still used for creation
 import Pagination from '@/components/Pagination/Pagination';
 import SearchFilterBar from '@/components/Layout/SearchFilterBar';
 import { RoleResponseDTO, PageResponseRole, PrivilegeResponseDTO, RoleRequest } from '@/type/user';
 import { PlusIcon } from '@heroicons/react/24/outline';
 
 export default function RolesPage() {
-  const [roles, setRoles] = useState<RoleResponseDTO[]>([]); // Initialize as empty array
+  const [roles, setRoles] = useState<RoleResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,11 +19,12 @@ export default function RolesPage() {
   const limitOnePage = 12;
 
   const [searchText, setSearchText] = useState<string>('');
-  const [selectedRole, setSelectedRole] = useState<string>('');
-  const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<string>(''); // Not currently used in backend filter, but kept for UI
+  const [selectedLocation, setSelectedLocation] = useState<string>(''); // Not currently used in backend filter, but kept for UI
   const [selectedSort, setSelectedSort] = useState<string>('A - Z');
 
   const [isFormOpen, setIsFormOpen] = useState(false);
+  // editingRole is now only for the Create Form context
   const [editingRole, setEditingRole] = useState<RoleResponseDTO | null>(null);
   const [allPrivileges, setAllPrivileges] = useState<PrivilegeResponseDTO[]>([]);
 
@@ -62,43 +62,33 @@ export default function RolesPage() {
       if (!res.ok) {
         let errorMessage = 'Failed to fetch roles';
         try {
-            const errorData = await res.json();
-            errorMessage = errorData.message || errorMessage;
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
         } catch (jsonError) {
-            // If response is not JSON, use generic message
-            console.error("Failed to parse error response:", jsonError);
+          console.error("Failed to parse error response:", jsonError);
         }
         throw new Error(errorMessage);
       }
 
       const data: PageResponseRole = await res.json();
 
-
-      // 🚨 FIX: Safely check if data.content exists before setting state
-
-      // if (data && Array.isArray(data.content)) { // Ensure it's an array
-      //   setRoles(data.content);
-      // } else {
-      //   console.warn("API response 'content' field is missing or not an array:", data);
-      //   setRoles([]); // Fallback to an empty array to prevent 'undefined'
-      // }
+      console.log('Fetched roles:', data.roles);
 
       if (data && Array.isArray(data.roles)) {
-        setRoles(data.roles); // ✅ Use 'roles' instead of 'content'
+        setRoles(data.roles);
       } else {
         console.warn("API response 'roles' field is missing or not an array:", data);
         setRoles([]);
       }
 
-      // 🚨 FIX: Safely check for totalPages and totalElements
-      setTotalPages(data.totalPages || 1); // Default to 1 if undefined
-      setTotalRoles(data.totalElements || 0); // Default to 0 if undefined
+      setTotalPages(data.totalPages || 1);
+      setTotalRoles(data.totalElements || 0);
 
     } catch (err) {
       console.error("Error fetching roles:", err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
-      setRoles([]); // Set to empty array on error to prevent undefined and render "No roles found"
-      setTotalPages(1); // Reset pagination on error
+      setRoles([]);
+      setTotalPages(1);
       setTotalRoles(0);
     } finally {
       setLoading(false);
@@ -119,10 +109,10 @@ export default function RolesPage() {
       if (!res.ok) {
         let errorMessage = 'Failed to fetch privileges';
         try {
-            const errorData = await res.json();
-            errorMessage = errorData.message || errorMessage;
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
         } catch (jsonError) {
-            console.error("Failed to parse privilege error response:", jsonError);
+          console.error("Failed to parse privilege error response:", jsonError);
         }
         throw new Error(errorMessage);
       }
@@ -139,14 +129,11 @@ export default function RolesPage() {
   }, [fetchRoles, fetchAllPrivileges]);
 
   const handleCreateRole = () => {
-    setEditingRole(null);
-    setIsFormOpen(true);
+    setEditingRole(null); // Explicitly set to null for creation
+    setIsFormOpen(true); // Open the RoleForm for creation
   };
 
-  const handleEditRole = (role: RoleResponseDTO) => {
-    setEditingRole(role);
-    setIsFormOpen(true);
-  };
+  // handleEditRole is no longer needed as RoleCard handles navigation directly
 
   const handleDeleteRole = async (roleId: number) => {
     if (!window.confirm(`Are you sure you want to delete role with ID: ${roleId}? This action cannot be undone.`)) {
@@ -161,10 +148,10 @@ export default function RolesPage() {
       if (!res.ok) {
         let errorMessage = 'Failed to delete role';
         try {
-            const errorData = await res.json();
-            errorMessage = errorData.message || errorMessage;
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
         } catch (jsonError) {
-            console.error("Failed to parse delete error response:", jsonError);
+          console.error("Failed to parse delete error response:", jsonError);
         }
         throw new Error(errorMessage);
       }
@@ -181,19 +168,18 @@ export default function RolesPage() {
   const handleSaveRole = async (roleData: RoleResponseDTO) => {
     setLoading(true);
     try {
-      const method = roleData.roleId === 0 ? 'POST' : 'PUT';
-      const url = roleData.roleId === 0 ? 'http://localhost:8080/iam/roles' : `http://localhost:8080/iam/roles/${roleData.roleId}`;
+      // This handleSaveRole is now primarily for *creating* new roles from this page
+      // Editing will happen on the [id]/page.tsx
+      const method = 'POST'; // Always POST when saving from the 'Create New Role' button on this page
+      const url = 'http://localhost:8080/iam/roles';
 
-      const privilegesForBackend = roleData.privileges.map(p => ({ privilegeId: p.privilegeId }));
+      const privilegesIdsForBackend = roleData.privileges.map(p => p.privilegeId);
 
       const roleToSend = {
-          ...roleData,
-          privileges: privilegesForBackend,
-          roleId: undefined,
-          createdBy: undefined,
-          updatedBy: undefined,
-          create_at: undefined,
-          update_at: undefined,
+          name: roleData.name,
+          code: roleData.code,
+          description: roleData.description,
+          privilegesIds: privilegesIdsForBackend,
       };
 
       const res = await fetch(url, {
@@ -204,19 +190,19 @@ export default function RolesPage() {
       });
 
       if (!res.ok) {
-        let errorMessage = `Failed to ${method === 'POST' ? 'create' : 'update'} role`;
+        let errorMessage = `Failed to create role`;
         try {
-            const errorData = await res.json();
-            errorMessage = errorData.message || errorMessage;
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
         } catch (jsonError) {
-            console.error("Failed to parse save error response:", jsonError);
+          console.error("Failed to parse save error response:", jsonError);
         }
         throw new Error(errorMessage);
       }
 
-      alert(`Role ${method === 'POST' ? 'created' : 'updated'} successfully!`);
+      alert(`Role created successfully!`);
       setIsFormOpen(false);
-      fetchRoles();
+      fetchRoles(); // Re-fetch roles to update the list
     } catch (err) {
       console.error("Error saving role:", err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred while saving role.');
@@ -231,7 +217,6 @@ export default function RolesPage() {
 
   const handleApplyFilters = () => {
     setCurrentPage(1);
-    // fetchRoles will be triggered by currentPage change or direct call
   };
 
   return (
@@ -248,11 +233,12 @@ export default function RolesPage() {
         onLocationChange={setSelectedLocation}
         selectedSort={selectedSort}
         onSortChange={setSelectedSort}
+        // onApplyFilters={handleApplyFilters}
       />
 
       <div className="flex justify-end mb-6">
         <button
-          onClick={handleCreateRole}
+          onClick={handleCreateRole} // This will now only trigger creation form
           className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
         >
           <PlusIcon className="h-5 w-5 mr-2" /> Create New Role
@@ -261,7 +247,6 @@ export default function RolesPage() {
 
       {loading && <div className="text-center py-8 text-blue-500">Loading roles...</div>}
       {error && <div className="text-center py-8 text-red-500">Error: {error}</div>}
-      {/* 🚨 FIX: No changes needed here, as roles is now guaranteed to be an array */}
       {!loading && !error && roles.length === 0 && (
         <div className="text-center py-8 text-gray-500">No roles found.</div>
       )}
@@ -273,7 +258,7 @@ export default function RolesPage() {
               <RoleCard
                 key={role.roleId}
                 role={role}
-                onEdit={handleEditRole}
+                // onEdit prop removed as RoleCard now handles navigation directly
                 onDelete={handleDeleteRole}
               />
             ))}
@@ -286,11 +271,12 @@ export default function RolesPage() {
         </>
       )}
 
+      {/* RoleForm is now only conditionally rendered for creation */}
       {isFormOpen && (
         <RoleForm
-          role={editingRole}
+          role={editingRole} // Will be null for new role creation
           allPrivileges={allPrivileges}
-          onSave={handleSaveRole}
+          onSave={handleSaveRole} // This now exclusively handles POST (create)
           onClose={() => setIsFormOpen(false)}
         />
       )}
