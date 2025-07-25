@@ -3,8 +3,9 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { fetchTestOrderById, fetchPatient, TestOrderRaw, BASE } from '../fetch';
-import { X } from 'lucide-react';
+import { fetchTestOrderById, fetchPatient, TestOrderRaw, BASE, CommentTO } from '../fetch';
+import { X,Edit, Trash } from 'lucide-react';
+import EditOrderCommentModel from '../components/EditOrderCommentModel'
 
 export default function TestOrderDetailPage() {
   const { id } = useParams();
@@ -12,6 +13,8 @@ export default function TestOrderDetailPage() {
   const [order, setOrder] = useState<TestOrderRaw| null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding]     = useState(false);
+  const [editingComment, setEditingComment] = useState<CommentTO | null>(null);
+  const [showEdit, setShowEdit]             = useState(false);
   const [commentText, setText]  = useState('');
   function extractIdNum(runBy: string | null): string | null {
   if (!runBy) {
@@ -20,6 +23,21 @@ export default function TestOrderDetailPage() {
   const m = runBy.match(/Email:\s*([^|]+)/);
   return m ? m[1] : null;
 }
+  function formatDDMMYYYY(isoString: string): string {
+  // Tạo đối tượng Date từ chuỗi
+  const date = new Date(isoString);
+  // Nếu không parse được → trả về chuỗi rỗng
+  if (isNaN(date.getTime())) {
+    return '';
+  }
+
+  const day   = date.getDate().toString().padStart(2, '0');        // ngày, 2 chữ số
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // tháng, 2 chữ số
+  const year  = date.getFullYear().toString();                     // năm, 4 chữ số
+
+  return `${day}/${month}/${year}`;
+}
+
   useEffect(() => {
     (async () => {
       try {
@@ -74,8 +92,57 @@ export default function TestOrderDetailPage() {
     }
   };
 
-  const handleUpdate      = () => router.push(`/testorders/${order.testId}/edit`);
+  // const handleUpdate      = () => router.push(`/testorders/${order.testId}/edit`);
   const handleViewResults = () => router.push(`/testorders/${order.testId}/results`);
+   const handleModifyComment = (commentId: number) => {
+    // tìm comment trong result hiện tại
+    const c = order.comments.find(c => c.id === commentId);
+    if (!c) return;
+    setEditingComment(c);
+    setShowEdit(true);
+  };
+  const saveModifiedOrderComment = async (updatedContent: string) => {
+  if (!order || !editingComment) return;
+  try {
+    const res = await fetch(
+      `${BASE}/comment/testorder/${editingComment.id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: updatedContent })
+    });
+    if (!res.ok) throw new Error(await res.text());
+
+    // sau khi server trả về comment mới (hoặc OK)
+    // cập nhật lại mảng comments trong state
+    setOrder(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        comments: prev.comments.map(c =>
+          c.id === editingComment.id
+            ? { ...c, content: updatedContent, modifiedAt: new Date().toISOString() }
+            : c
+        )
+      };
+    });
+    setShowEdit(false);
+    setEditingComment(null);
+  } catch (err) {
+    console.error(err);
+    alert('Failed to modify comment');
+  }
+};
+  const handleDeleteComment = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+    await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder'}/comment/testorder/${id}`,
+      { method: 'DELETE',
+        credentials: 'include'
+       }
+    );
+    router.push('/testorders');
+  }
   const handleGenerate = async () => {
     try {
       const res = await fetch(
@@ -93,10 +160,7 @@ export default function TestOrderDetailPage() {
       }
 
       // 1) Chuyển qua trang xem kết quả
-      
-      window.location.href = `/testorders/${order.testId}`;
-
-      
+      router.push(`/testorders/${order.testId}`);
       // — hoặc nếu bạn chỉ muốn ở lại page detail mà reload data:
       // router.refresh();
 
@@ -173,14 +237,36 @@ export default function TestOrderDetailPage() {
             <p className="italic text-center">No comments yet.</p>
           ) : (
             order.comments.map(c => (
-              <div  className="mb-6">
-                <p className="text-gray-500 text-sm">
-                  "{extractIdNum(c.createdBy)}"
-                </p>
-                <p className="border-l-2 border-green-400 pl-4 italic">
-                  “{c.content}”
-                </p>
-              </div>
+              <div className="mb-6 flex justify-between items-start">
+            <div>
+              <p className="text-gray-500 text-sm">
+                {extractIdNum(c.createdBy)}
+              </p>
+              <p className="text-gray-500 text-sm">
+                {formatDDMMYYYY(c.createdAt)}
+              </p>
+              <p className="border-l-2 border-green-400 pl-4 italic">
+                “{c.content}”
+              </p>
+            </div>
+
+            {/* Hai nút Modify / Delete ở bên phải */}
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handleModifyComment(c.id)}
+                className="px-2 py-1 text-sm text-blue-600 hover:text-blue-800"
+              >
+                <Edit size={14}></Edit>
+              </button>
+              <button
+                onClick={() => handleDeleteComment(c.id)}
+                className="px-2 py-1 text-sm text-red-600 hover:text-red-800"
+              >
+                <Trash size={14}></Trash>
+              </button>
+            </div>
+          </div>
+
             ))
           )}
 
@@ -228,6 +314,14 @@ export default function TestOrderDetailPage() {
           </div>
         </div>
       )}
+      {/* Modal chỉnh sửa */}
+{showEdit && editingComment && (
+  <EditOrderCommentModel
+    comment={editingComment}
+    onClose={() => setShowEdit(false)}
+    onSave={saveModifiedOrderComment}
+  />
+)}
     </div>
   );
 }

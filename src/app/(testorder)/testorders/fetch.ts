@@ -11,14 +11,18 @@ export interface Patient {
   // ... nếu còn thuộc tính khác
 }
 export interface Comment {
+  id: number;
   content:   string;
   createdBy: string;
   updateBy:  string | null;
+  createdAt: string;
 }
 export interface CommentTO {
+  id: number;
   content:   string;
   createdBy: string;
   updateBy:  string | null;
+  createdAt: string;
 }
 export interface Result {
   id:   number;
@@ -43,9 +47,11 @@ export interface TestOrderRaw {
     comment_result: Comment[];
   }[];
   comments: {
+    id: number;
     content:  string;
     createdBy:string;
     updateBy: string | null;
+    createdAt: string ;
   }[];
   fullName:    string;
   address:     string;
@@ -64,10 +70,19 @@ export interface PageResponse<T> {
   hasPrevious:   boolean;
   // ... các trường khác nếu cần
 }
+export interface PageFilter<T> {
+  content:  T[];
+  last: boolean,
+  totalElements: number,
+  totalPages: number,
+  first: boolean,
+  size: number,
+  number: number, 
+}
 export interface ResultDetails {
   id: number;
   paramName: string;
-  value: string;
+  value: number;
   unit: string;
   rangeMin: number;
   rangeMax: number;
@@ -76,18 +91,16 @@ export interface ResultDetails {
 
 // Mỗi TestOrder gồm thêm object Patient
 export interface TestOrder {
-  testId: number;
+  id: number;
+  fullName:    string;
+  age: number;
+  gender:      string;
+  phone:       string;
   status:     string;
-  updateBy:   string | null;
+  createdBy:   string | null;
   runBy:      string | null;
   runAt:      string;
-  results:    Result[];
-  comments:   CommentTO[];
-  fullName:    string;
-  address:     string;
-  gender:      string;
-  dateOfBirth: string;
-  phone:       string;
+  
 }
 
 export const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder';

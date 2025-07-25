@@ -38,7 +38,7 @@ const TestOrderTable: FC<Props> = ({ data, reload }) => {
           <thead className="bg-gray-100">
             <tr>
               {/* <th className="p-2"><input type="checkbox" /></th> */}
-              {['Patient name','Age','Gender','Phone','Status','Create at','Run by','View'].map(h => (
+              {['Patient name','Age','Gender','Phone','Status','Create by','Run date','Run by','View'].map(h => (
                 <th
                   key={h}
                   className="p-2 text-left text-sm font-medium text-gray-600"
@@ -50,30 +50,32 @@ const TestOrderTable: FC<Props> = ({ data, reload }) => {
           </thead>
           <tbody>
             {data.map(o => (
-              <tr key={o.testId} className="border-t hover:bg-green-50">
+              <tr key={o.id} className="border-t hover:bg-green-50">
                 {/* <td className="p-2">
                   <input type="checkbox" />
                 </td> */}
                 <td className="p-2">{o.fullName}</td>
                 <td className="p-2">
-                  {new Date().getFullYear() - new Date(o.dateOfBirth).getFullYear()}
+                  {o.age}
                 </td>
                 <td className="p-2">{o.gender}</td>
                 <td className="p-2">{o.phone}</td>
                 <td
-                  className={
-                    `p-2 ` +
-                    (o.status.toLowerCase() === 'completed'
+                  className={`p-2 ${
+                    o.status.toLowerCase() === 'completed'
                       ? 'text-green-600'
-                      : 'text-orange-500')
-                  }
+                      : o.status.toLowerCase() === 'reviewed'
+                        ? 'text-blue-600'
+                        : 'text-orange-500'
+                  }`}
                 >
                   {o.status.toLowerCase()}
                 </td>
+                <td className="p-2">{extractIdNum(o.createdBy) || '-'}</td>
                 <td className="p-2">{new Date(o.runAt).toLocaleDateString()}</td>
                 <td className="p-2">{extractIdNum(o.runBy) || '-'}</td>
                 <td className="p-2">
-                  <Link href={`/testorders/${o.testId}`}>
+                  <Link href={`/testorders/${o.id}`}>
                     <button className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
                       View
                     </button>

@@ -1,23 +1,34 @@
 'use client';
 import { FC, useState } from 'react';
 
-interface Props { onSearch: (q:string)=>void; onSort: (s:string)=>void; onFilter: ()=>void; }
-const FilterBar: FC<Props> = ({ onSearch, onSort, onFilter }) => {
-  const [q, setQ] = useState('');
-  const [sort, setSort] = useState('nameAsc');
+interface Props {
+  searchText: string;
+  onSearch: (q: string) => void;
+  sortKey: 'nameAsc' | 'nameDesc';
+  onSort: (s: 'nameAsc' | 'nameDesc') => void;
+}
+const FilterBar: FC<Props> = ({ searchText, onSearch, sortKey, onSort }) => {
   return (
     <div className="flex p-4 space-x-4">
-      <input placeholder="Search test..." className="flex-1 p-2 border rounded-lg"
-        value={q} onChange={e=>setQ(e.target.value)}
-        onKeyDown={e=>e.key==='Enter'&&onSearch(q)}
+      <input
+        autoFocus   
+        type="text"
+        placeholder="Search patient name..."
+        className="flex-1 p-2 border rounded-lg"
+        value={searchText}
+        onChange={e => onSearch(e.target.value)}
       />
-      <select className="p-2 border rounded-lg" value={sort}
-        onChange={e=>{ setSort(e.target.value); onSort(e.target.value); }}>
-        <option value="nameAsc">Name: A-Z</option>
-        <option value="nameDesc">Name: Z-A</option>
+
+      <select
+        className="p-2 border rounded-lg"
+        value={sortKey}
+        onChange={e => onSort(e.target.value as 'nameAsc' | 'nameDesc')}
+      >
+        <option value="nameAsc">Name: A–Z</option>
+        <option value="nameDesc">Name: Z–A</option>
       </select>
-      <button onClick={onFilter} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Apply filter</button>
     </div>
   );
 };
+
 export default FilterBar;
