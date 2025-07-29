@@ -2,14 +2,17 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
 import UserCard from '@/components/Card/UserCard';
 import Pagination from '@/components/Pagination/Pagination';
-import SearchFilterBar from '@/components/Layout/SearchFilterBar'; 
-import { UserResponseDTO, PageResponse } from '@/type/user';
+import SearchFilterBar from '@/components/Layout/SearchFilterBar';
+import UserForm from '@/components/Form/UserForm'; // Import the UserForm component
+import { UserResponseDTO, PageResponse, RoleResponseDTO, CreateUserRequest } from '@/type/user';
+import { PlusIcon } from '@heroicons/react/24/outline'; // For the create button icon
+import toast from 'react-hot-toast'; // Import toast
 
 export default function UsersPage() {
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
   const [users, setUsers] = useState<UserResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,12 +24,18 @@ export default function UsersPage() {
 
   const [selectedRole, setSelectedRole] = useState<string>('');
   const [selectedLocation, setSelectedLocation] = useState<string>('');
-  const [selectedSort, setSelectedSort] = useState<string>('A - Z'); 
+  const [selectedSort, setSelectedSort] = useState<string>('A - Z');
 
-  const limitOnePage = 12; 
+  const limitOnePage = 12;
 
-  const sortBy = 'fullName'; // Assuming 'fullName' for sorting users
+  const sortBy = 'fullName';
   const direction = selectedSort === 'Z - A' ? 'desc' : 'asc';
+
+  // State for the user creation form
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [allRoles, setAllRoles] = useState<RoleResponseDTO[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
+  const [rolesError, setRolesError] = useState<string | null>(null);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -36,8 +45,7 @@ export default function UsersPage() {
       searchText: searchText || '',
       sortBy: sortBy,
       direction: direction,
-      // Reverting to your original logic: currentPage.toString()
-      offsetPage: currentPage.toString(), 
+      offsetPage: currentPage.toString(),
       limitOnePage: limitOnePage.toString(),
       ...(selectedRole && { role: selectedRole }),
       ...(selectedLocation && { location: selectedLocation }),
@@ -46,45 +54,36 @@ export default function UsersPage() {
     try {
       const url = `http://localhost:8080/iam/users/filter?${params.toString()}`;
       console.log("fetching: ", url);
-      const options :RequestInit = {
+      const options: RequestInit = {
         method: 'GET',
         credentials: 'include',
       };
 
-      console.log("Fetch options: ", options);
       const res = await fetch(url, options);
-      // const res = await fetch(`http://localhost:8080/iam/users/filter?${params.toString()}`, {
-      //   method: 'GET',
-      //   credentials: 'include',
-      // });
 
       if (!res.ok) {
         let errorMessage = 'Failed to fetch users';
-
         try {
           const contentType = res.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {
             const errorData = await res.json();
             errorMessage = errorData.message || errorMessage;
           } else {
-            // Try to read plain text fallback
             const errorText = await res.text();
             errorMessage = errorText || errorMessage;
           }
         } catch (e) {
           console.warn("Error parsing error response:", e);
         }
-
         throw new Error(errorMessage);
       }
 
-
       const data: PageResponse<UserResponseDTO> = await res.json();
-      
+
       setUsers(data.content);
       setTotalPages(data.totalPages);
       setTotalUsers(data.totalElements);
-      
+
     } catch (err) {
       console.error("Error fetching users:", err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
@@ -93,13 +92,37 @@ export default function UsersPage() {
     }
   }, [searchText, selectedRole, selectedLocation, selectedSort, currentPage]);
 
+  const fetchAllRoles = useCallback(async () => {
+    setRolesLoading(true);
+    setRolesError(null);
+    try {
+      const res = await fetch('http://localhost:8080/iam/roles', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to fetch roles');
+      }
+      const data: RoleResponseDTO[] = await res.json();
+      setAllRoles(data);
+    } catch (err) {
+      console.error("Error fetching roles:", err);
+      setRolesError(err instanceof Error ? err.message : 'An unknown error occurred while fetching roles.');
+    } finally {
+      setRolesLoading(false);
+    }
+  }, []);
+
+
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+    fetchAllRoles(); // Fetch roles when the component mounts
+  }, [fetchUsers, fetchAllRoles]);
 
   const handleSearchChange = (text: string) => {
     setSearchText(text);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   const handleRoleChange = (role: string) => {
@@ -123,16 +146,12 @@ export default function UsersPage() {
     }
   };
 
-  // --- Implementation for 'View' button to navigate ---
   const handleViewUser = (userId: number) => {
-    // Navigate to the user details page using Next.js router
-    router.push(`/iam/users/${userId}`); 
+    router.push(`/iam/users/${userId}`);
   };
 
-  // --- Implementations for 'Edit' and 'Delete' buttons ---
   const handleEditUser = (userId: number) => {
     console.log(`Edit user with ID: ${userId}`);
-    // You could navigate to the same details page with an edit mode flag, e.g.:
     router.push(`/iam/users/${userId}?mode=edit`);
   };
 
@@ -153,13 +172,85 @@ export default function UsersPage() {
         throw new Error(errorData.message || 'Failed to delete user');
       }
 
-      // Re-fetch users to update the list after deletion
-      fetchUsers(); 
-      alert('User deleted successfully!');
+      fetchUsers();
+      toast.success('User deleted successfully!'); // Use toast
     } catch (err) {
       console.error("Error deleting user:", err);
       setError(err instanceof Error ? err.message : 'Failed to delete user.');
+      toast.error('Failed to delete user.'); // Use toast
+    } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateNewUserClick = () => {
+    setIsCreateFormOpen(true);
+  };
+
+  const handleSaveNewUser = async (userData: CreateUserRequest) => {
+    setLoading(true); // Indicate loading for the main page during form submission
+    setError(null); // Clear any previous errors
+
+    try {
+      const res = await fetch('http://localhost:8080/iam/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(userData),
+      });
+
+      // Attempt to parse JSON regardless of res.ok status to get error details
+      const responseData = await res.json();
+      console.log("Response status:", res.status);
+      console.log("Request payload (userData):", userData);
+      console.log("Full response data (errorData/successData):", responseData);
+
+      if (!res.ok) {
+        // Construct an error object that the catch block can understand
+        const errorToThrow: any = new Error(responseData.message || "User creation failed");
+        errorToThrow.response = { data: responseData }; // Attach the response data for error handling
+        throw errorToThrow;
+      }
+
+      // If the request was successful
+      toast.success('User created successfully!');
+      setIsCreateFormOpen(false); // Close the form ONLY on success
+      fetchUsers(); // Re-fetch users to update the list
+    } catch (err: any) {
+      console.error("Error caught in handleSaveNewUser:", err);
+      const errorData = err.response?.data; // Use optional chaining to access data from the thrown error
+
+      const newFieldErrors: { [key: string]: string } = {};
+
+      if (errorData && Array.isArray(errorData.error) && errorData.error.length > 0) {
+        // This handles the backend's `duplicateFields` array
+        for (const field of errorData.error) {
+          if (field === 'email') newFieldErrors.email = "This email is already registered.";
+          else if (field === 'phone') newFieldErrors.phone = 'This phone number is already registered.';
+          else if (field === 'identify') newFieldErrors.identifyNum = 'This identity number is already registered.';
+        }
+        // Attach field errors to the main error object before re-throwing for UserForm
+        err.fieldErrors = newFieldErrors;
+        toast.error("Registration failed due to duplicate information.");
+      } else if (errorData?.message) {
+        // General message from backend
+        toast.error(errorData.message);
+      } else {
+        // Network error or client-side thrown error without specific backend message
+        toast.error(err.message || 'An unknown error occurred during user creation.');
+      }
+      
+      // IMPORTANT: Only close the form if the error is NOT a fieldError.
+      // UserForm is responsible for handling and displaying fieldErrors itself.
+      if (!err.fieldErrors || Object.keys(err.fieldErrors).length === 0) {
+        setIsCreateFormOpen(false); // Close form for general errors or non-field-specific issues
+      }
+
+      throw err; // Re-throw so UserForm can catch and display field errors if present
+    } finally {
+      setLoading(false); // Stop loading indicator
     }
   };
 
@@ -168,16 +259,23 @@ export default function UsersPage() {
       <div className="text-sm text-gray-500 mb-4">IAM / Users</div>
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Users Management</h1>
 
+      {/* Search and Filter Bar */}
       <SearchFilterBar
         searchText={searchText}
         onSearchChange={handleSearchChange}
-        selectedRole={selectedRole}
-        onRoleChange={handleRoleChange}
-        selectedLocation={selectedLocation}
-        onLocationChange={handleLocationChange}
         selectedSort={selectedSort}
         onSortChange={handleSortChange}
       />
+
+      {/* Create New User Button - Moved below the SearchFilterBar */}
+      <div className="flex justify-end mb-6 mt-4"> {/* Added mt-4 for spacing */}
+        <button
+          onClick={handleCreateNewUserClick}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out flex items-center"
+        >
+          <PlusIcon className="h-5 w-5 mr-2" /> Create New User
+        </button>
+      </div>
 
       {loading && <div className="text-center py-8 text-blue-500">Loading users...</div>}
       {error && <div className="text-center py-8 text-red-500">Error: {error}</div>}
@@ -189,11 +287,11 @@ export default function UsersPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {users.map((user) => (
-              <UserCard 
-                key={user.id} 
-                user={user} 
-                onView={handleViewUser} // This will now navigate
-                onEdit={handleEditUser} // This will also navigate (optional edit mode)
+              <UserCard
+                key={user.id}
+                user={user}
+                onView={handleViewUser}
+                onEdit={handleEditUser}
                 onDelete={handleDeleteUser}
               />
             ))}
@@ -204,6 +302,17 @@ export default function UsersPage() {
             onPageChange={handlePageChange}
           />
         </>
+      )}
+
+      {isCreateFormOpen && (
+        <UserForm
+          user={null} // Null for creation
+          allRoles={allRoles}
+          rolesLoading={rolesLoading}
+          rolesError={rolesError}
+          onSave={handleSaveNewUser} // This will handle the POST request
+          onClose={() => setIsCreateFormOpen(false)}
+        />
       )}
     </div>
   );

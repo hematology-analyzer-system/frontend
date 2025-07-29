@@ -251,7 +251,7 @@ const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCance
           readOnly={!isEditing}
           className={!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}
         />
-        <FormField
+        {/* <FormField
           label="Status"
           name="status"
           value={formData.status}
@@ -260,7 +260,27 @@ const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCance
           placeholder="Enter status (e.g., ACTIVE, INACTIVE)"
           readOnly={!isEditing}
           className={!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}
+        /> */}
+        {isEditing ? (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="INACTIVE">INACTIVE</option>
+            </select>
+          </div>
+        ) : (
+          <DisplayField
+            label="Status"
+            value={formData.status}
+            icon={CheckCircleIcon}
         />
+        )}
         <FormField
           label="Identify Number"
           name="identifyNum"
@@ -320,7 +340,7 @@ const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCance
         />
 
         {/* Photo Upload Section */}
-        <div className="md:col-span-2 flex items-center mt-4">
+        {/* <div className="md:col-span-2 flex items-center mt-4">
           <div className="w-24 h-24 rounded-full overflow-hidden mr-4 border-4 border-blue-100 flex-shrink-0">
             <img
               src={formData.profileImageUrl || `https://placehold.co/96x96/ADD8E6/000000?text=${formData.fullName?.charAt(0) ?? 'U'}`}
@@ -334,7 +354,79 @@ const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCance
               Upload
             </button>
           </div>
-        </div>
+        </div> */}
+ <div className="md:col-span-2 flex items-center mt-4">
+  <div className="w-24 h-24 rounded-full overflow-hidden mr-4 border-4 border-blue-100 flex-shrink-0">
+    <img
+      src={
+        formData.profileImageUrl ||
+        `https://placehold.co/96x96/ADD8E6/000000?text=${formData.fullName?.charAt(0) ?? 'U'}`
+      }
+      alt={formData.fullName ?? 'User'}
+      className="w-full h-full object-cover"
+    />
+  </div>
+
+  <div>
+    <p className="text-md font-medium text-gray-800 mb-2">Profile photo (max 5MB)</p>
+
+    {formData.profileImageUrl ? (
+      <button
+        type="button"
+        onClick={() => {
+          // Clear the current image to re-show file input
+          setFormData((prev) => ({
+            ...prev,
+            profileImageUrl: "",
+          }));
+        }}
+        className="text-sm font-semibold text-blue-600 hover:underline"
+      >
+        Change Picture
+      </button>
+    ) : (
+      <input
+        type="file"
+        accept="image/*"
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+
+          const formDataObj = new FormData();
+          formDataObj.append("file", file);
+
+          try {
+            const res = await fetch("http://localhost:8080/iam/users/upload", {
+              method: "POST",
+              body: formDataObj,
+              credentials: "include",
+            });
+
+            if (!res.ok) {
+              const error = await res.text();
+              throw new Error(error || "Upload failed");
+            }
+
+            const data = await res.json();
+            const uploadedUrl = data.url;
+
+            setFormData((prev) => ({
+              ...prev,
+              profileImageUrl: uploadedUrl,
+            }));
+          } catch (error) {
+            console.error("Upload error:", error);
+            alert("Failed to upload image.");
+          }
+        }}
+        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                   file:rounded-md file:border-0 file:text-sm file:font-semibold
+                   file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+      />
+    )}
+  </div>
+</div>
+
       </div>
 
       {/* Save/Cancel Buttons */}

@@ -76,3 +76,15 @@ export interface PageResponseRole {
     empty: boolean;
     message: string;
 }
+
+export interface CreateUserRequest {
+    fullName: string;
+    email: string;
+    phone: string;
+    identifyNum: string;
+    address?: string;
+    gender?: string;
+    password?: string; // This should ideally be handled securely, maybe generated or set after creation
+    date_of_Birth: string; // YYYY-MM-DD format expected
+    roleIds: number[];
+}

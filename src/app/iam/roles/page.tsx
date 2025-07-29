@@ -227,10 +227,10 @@ export default function RolesPage() {
       <SearchFilterBar
         searchText={searchText}
         onSearchChange={setSearchText}
-        selectedRole={selectedRole}
-        onRoleChange={setSelectedRole}
-        selectedLocation={selectedLocation}
-        onLocationChange={setSelectedLocation}
+        // selectedRole={selectedRole}
+        // onRoleChange={setSelectedRole}
+        // selectedLocation={selectedLocation}
+        // onLocationChange={setSelectedLocation}
         selectedSort={selectedSort}
         onSortChange={setSelectedSort}
         // onApplyFilters={handleApplyFilters}
