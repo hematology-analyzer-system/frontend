@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 import { fetchTestOrderById, TestOrderRaw, Result, BASE, Comment, ResultDetails } from '../../fetch';
 import AddResultCommentModal from '../../components/AddResultCommentModal';
 import Link from 'next/link';
-import {Edit, Trash} from 'lucide-react'
+import {Edit, Trash,Download, Eye, FileText} from 'lucide-react'
 import EditResultCommentModel from '../../components/EditResultCommentModel'
-
+// import { generateTestOrderPDF } from '../../utils/pdfGenerator';
+import { generateSimpleTestOrderPDF } from '../../utils/simplePdfGenerator';
 export default function TestOrderResultsPage() {
   const { id } = useParams();               // lấy test-order ID từ URL
   const [order, setOrder]       = useState<TestOrderRaw | null>(null);
@@ -18,6 +19,7 @@ export default function TestOrderResultsPage() {
   const [showEdit, setShowEdit]             = useState(false);
   const [editMode, setEditMode]       = useState(false);
   const [editedValues, setEditedValues] = useState<number[]>([]);
+  const [showPDFOptions, setShowPDFOptions] = useState(false);
   function extractIdNum(runBy: string | null): string | null {
   if (!runBy) {
     return null
@@ -196,6 +198,30 @@ export default function TestOrderResultsPage() {
   const handlePrint = () => {
     window.print();
   };
+
+  const handleDownloadCurrentResult = () => {
+    if (!order) return;
+    generateSimpleTestOrderPDF(order, result, false, false);
+    setShowPDFOptions(false);
+  };
+
+  const handlePreviewCurrentResult = () => {
+    if (!order) return;
+    generateSimpleTestOrderPDF(order, result, false, true);
+    setShowPDFOptions(false);
+  };
+
+  const handleDownloadAllResults = () => {
+    if (!order) return;
+    generateSimpleTestOrderPDF(order, undefined, true, false);
+    setShowPDFOptions(false);
+  };
+
+  const handlePreviewAllResults = () => {
+    if (!order) return;
+    generateSimpleTestOrderPDF(order, undefined, true, true);
+    setShowPDFOptions(false);
+  };
   if (loading) return <div>Loading…</div>;
   if (!order) return <div>Testorder not found</div>;
   if (!order.results) return <div>No results available</div>;
@@ -203,7 +229,7 @@ export default function TestOrderResultsPage() {
   const results = order.results;
   const result: Result  = results[selected];
   const details = result.detailResults as ResultDetails[];
-
+  console.log(result);
   // mỗi lần chuyển tab result, reset editedValues
   
 
@@ -313,12 +339,55 @@ export default function TestOrderResultsPage() {
             >
               Delete
             </button>
-            <button
-                  onClick={handlePrint}
-                  className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
-                >
-                  Print results
-                </button>
+            <div className="relative">
+                  <button
+                    onClick={() => setShowPDFOptions(!showPDFOptions)}
+                    className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 flex items-center gap-2"
+                  >
+                    <FileText size={16} />
+                    Print Results
+                  </button>
+                  
+                  {showPDFOptions && (
+                    <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-48">
+                      <div className="p-2">
+                        <div className="text-sm font-semibold text-gray-700 mb-2">Current Result</div>
+                        <button
+                          onClick={handlePreviewCurrentResult}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2"
+                        >
+                          <Eye size={14} />
+                          Preview Current
+                        </button>
+                        <button
+                          onClick={handleDownloadCurrentResult}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2"
+                        >
+                          <Download size={14} />
+                          Download Current
+                        </button>
+                        
+                        <hr className="my-2" />
+                        
+                        <div className="text-sm font-semibold text-gray-700 mb-2">All Results</div>
+                        <button
+                          onClick={handlePreviewAllResults}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2"
+                        >
+                          <Eye size={14} />
+                          Preview All
+                        </button>
+                        <button
+                          onClick={handleDownloadAllResults}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2"
+                        >
+                          <Download size={14} />
+                          Download All
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </>
             )}
             
@@ -374,7 +443,12 @@ export default function TestOrderResultsPage() {
           </button>
         </div>
       </div>
-
+      {showPDFOptions && (
+        <div 
+          className="fixed inset-0 z-5" 
+          onClick={() => setShowPDFOptions(false)}
+        />
+      )}
       {/* Modal Add comment */}
       {showAdd && (
         <AddResultCommentModal

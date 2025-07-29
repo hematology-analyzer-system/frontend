@@ -19,36 +19,19 @@ export default function TestOrderPage() {
   const [page, setPage] = useState(0);
   const size = 5;
   const [searchText, setSearchText] = useState('');
-  const [sortKey, setSortKey]       = useState<'nameAsc' | 'nameDesc'>('nameAsc');
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder';
-  // const loadPage = async () => {
-  //   setLoading(true);
-  //   try {
-      
-  //     const response = await fetch(
-  //       `${API_URL}/testorder/search?page=${page}&size=${size}`,
-  //       { credentials: 'include' }
-  //     );
-  //     if (!response.ok) {
-  //       console.error('Failed fetching test orders:', response.statusText);
-  //       setPageData(null);
-  //     } else {
-  //       const data: PageResponse<TestOrder> = await response.json();
-  //       setPageData(data);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error loading test orders:', error);
-  //     setPageData(null);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const [sortKey, setSortKey] = useState<'nameAsc' | 'nameDesc'>('nameAsc');
   
+  // New date range state
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder';
 
+  // Trigger search when any filter changes
   useEffect(() => {
-    const to = setTimeout(fetchFiltered, 300);
+    const to = setTimeout(fetchFiltered, 1000);
     return () => clearTimeout(to);
-  }, [searchText, sortKey, page]);
+  }, [searchText, sortKey, page, startDate, endDate]);
 
   async function fetchFiltered() {
     setLoading(true);
@@ -64,6 +47,16 @@ export default function TestOrderPage() {
       url.searchParams.set('direction', direction);
       url.searchParams.set('offsetPage', String(page + 1));
       url.searchParams.set('limitOnePage', String(size));
+      
+      // Add date range parameters
+       if (startDate) {
+        // Convert date to LocalDateTime format (start of day)
+        url.searchParams.set('fromDate', `${startDate}T00:00:00`);
+      }
+      if (endDate) {
+        // Convert date to LocalDateTime format (end of day)
+        url.searchParams.set('toDate', `${endDate}T23:59:59`);
+      }
 
       const res = await fetch(url.toString(), {
         credentials: 'include'
@@ -79,13 +72,32 @@ export default function TestOrderPage() {
     }
   }
 
+  // Handler functions for date filter
+  const handleStartDateChange = (date: string) => {
+    setPage(0); // Reset to first page when filter changes
+    setStartDate(date);
+  };
+
+  const handleEndDateChange = (date: string) => {
+    setPage(0); // Reset to first page when filter changes
+    setEndDate(date);
+  };
+
+  const handleClearDateFilter = () => {
+    setPage(0);
+    setStartDate('');
+    setEndDate('');
+  };
+
   if (loading) {
     return <div className="p-4 text-center">Loading…</div>;
   }
   if (!pageData) {
     return <div className="p-4 text-center text-red-600">Failed to load</div>;
   }
+  
   console.log(pageData);
+  
   // Map raw to UI type
   const orders: TestOrder[] = pageData.content.map(raw => ({
     id: raw.id,
@@ -94,22 +106,26 @@ export default function TestOrderPage() {
     gender: raw.gender,
     phone: raw.phone,
     status: raw.status,
-    
     createdBy: raw.createdBy,
     runBy: raw.runBy,
     runAt: raw.runAt
-    
   }));
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Filter Bar */}
+      {/* Enhanced Filter Bar with Date Range */}
       <FilterBar
         searchText={searchText}
         onSearch={q => { setPage(0); setSearchText(q); }}
         sortKey={sortKey}
         onSort={s => { setPage(0); setSortKey(s); }}
+        startDate={startDate}
+        endDate={endDate}
+        onStartDateChange={handleStartDateChange}
+        onEndDateChange={handleEndDateChange}
+        onClearDateFilter={handleClearDateFilter}
       />
+      
       <TestOrderTable data={orders} reload={fetchFiltered} />
 
       <div className="flex justify-between items-center p-4">
