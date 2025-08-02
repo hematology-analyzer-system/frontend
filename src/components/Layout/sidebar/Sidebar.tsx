@@ -75,10 +75,12 @@ export const Sidebar = () => {
     const storedRoles = localStorage.getItem("roles");
     if (storedRoles) {
       try {
-        const roles = JSON.parse(storedRoles);
-        if (Array.isArray(roles) && roles.length > 0 && roles[0].code) {
-          setRoleCode(roles[0].code);
-        }
+        // const roles = JSON.parse(storedRoles);
+        // if (Array.isArray(roles) && roles.length > 0 && roles[0].code) {
+        //   // setRoleCode(roles[0].code);
+          
+        // }
+        setRoleCode("ROLE_ADMIN");
       } catch (e) {
         console.error("Invalid roles in localStorage", e);
       }

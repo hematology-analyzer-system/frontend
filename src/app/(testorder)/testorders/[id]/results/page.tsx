@@ -73,6 +73,7 @@ export default function TestOrderResultsPage() {
   };
   const saveModifiedOrderComment = async (updatedContent: string) => {
   if (!order || !editingComment) return;
+  console.log(editingComment);
   try {
     const res = await fetch(
       `${BASE}/comment/result/${editingComment.id}`, {

@@ -3,16 +3,12 @@ import FilterBar from './components/FilterBar';
 import { useEffect, useState } from 'react';
 import TestOrderTable from './components/TestOrderTable';
 import {
-  TestOrderRaw,
-  ResultDetails,
-  CommentTO,
-  Comment,
   // PageResponse imported for typing the paginated response
   PageFilter,
   // UI type for TestOrder after mapping
   TestOrder
 } from './fetch';
-
+import TestOrderStatusChart from './components/TestOrderStatusChart';
 export default function TestOrderPage() {
   const [pageData, setPageData] = useState<PageFilter<TestOrder> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -114,6 +110,7 @@ export default function TestOrderPage() {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Enhanced Filter Bar with Date Range */}
+      <TestOrderStatusChart data={pageData}/>
       <FilterBar
         searchText={searchText}
         onSearch={q => { setPage(0); setSearchText(q); }}

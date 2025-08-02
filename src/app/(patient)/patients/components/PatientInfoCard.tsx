@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Patient } from "@/type/Patient";
+import { Patient } from "../fetch";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import LogoutButton from "../Button/logoutBtn";
+import LogoutButton from "@/components/Button/logoutBtn";
 
 
 export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
@@ -56,6 +56,7 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
       const res = await fetch(`http://localhost:8081/patient/patients/${patient.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({
           fullName: formData.fullName,
           address: formData.address,
@@ -68,6 +69,7 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
 
       if (!res.ok) throw new Error("Update failed");
       alert("Saved successfully!");
+      setEdited(false);
       setEditMode({
          fullName: false,
         address: false,
@@ -92,6 +94,7 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
   try {
     const res = await fetch(`http://localhost:8081/patient/patients/${patient.id}`, {
       method: "DELETE",
+      credentials: 'include'
     });
 
     if (!res.ok) throw new Error("Failed to delete");
@@ -191,7 +194,7 @@ const renderField = (
           Delete Patient
         </button>
 
-        <LogoutButton></LogoutButton>
+        {/* <LogoutButton></LogoutButton> */}
 
         {edited && (
           <button
