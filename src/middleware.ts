@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // const PROTECTED_PATHS = ["/dashboard", "/admin", "/profile"];
-const PROTECTED_PATHS = ["/patients", "/iam"];
+const PROTECTED_PATHS = ["/patients", "/iam", "/testorders"];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
@@ -20,5 +20,5 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   // matcher: ["/dashboard/:path*", "/admin/:path*", "/profile/:path*"],
-  matcher: ["/patients/:path*", "/iam/:path*"],
+  matcher: ["/patients/:path*", "/iam/:path*", "/testorders/:path*"],
 };
