@@ -121,6 +121,7 @@
 //   );
 // };
 
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -135,116 +136,92 @@ import {
   Cog6ToothIcon,
   LifebuoyIcon,
   ArrowLeftEndOnRectangleIcon,
-  Squares2X2Icon // Used for Dashboard
+  Squares2X2Icon
 } from "@heroicons/react/24/outline";
 import React from "react";
 
-// Define a type for the navigation items, including an optional privilegeId
+// Define a type for the navigation items
 interface NavItem {
   href: string;
   label: string;
   icon: React.ReactNode;
-  privilegeId?: number | null; // Optional privilege ID required to view this item
   children?: NavItem[];
 }
 
-// Master list of all possible sidebar items with their required privilege ID.
-// A 'null' privilegeId means the item is visible to all authenticated users.
-const MASTER_SIDEBAR_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: <Squares2X2Icon className="h-5 w-5 text-gray-500" />, privilegeId: null },
-  {
-    href: "#",
-    label: "IAM",
-    icon: <FingerPrintIcon className="h-5 w-5 text-gray-500" />,
-    privilegeId: null, // A parent item doesn't need a privilege, it's shown if any children are visible
-    children: [
-      // Privilege ID 13 is required to view the "Users" link
-      { href: "/iam/users", label: "Users", icon: <UsersIcon className="h-5 w-5 text-gray-500" />, privilegeId: 13 },
-      // Privilege ID 18 is required to view the "Roles" link
-      { href: "/iam/roles", label: "Roles", icon: <TagIcon className="h-5 w-5 text-gray-500" />, privilegeId: 18 },
-    ],
-  },
-  // Privilege ID 1 is required to view the "Patients" link
-  { href: "/patients", label: "Patients", icon: <UsersIcon className="h-5 w-5 text-gray-500" />, privilegeId: 1 },
-  {
-    href: "#",
-    label: "Testorder",
-    icon: <BeakerIcon className="h-5 w-5 text-gray-500" />,
-    privilegeId: null, // A parent item doesn't need a privilege, it's shown if any children are visible
-    children: [
-      // Privilege ID 1 is required to view the "Orders" link
-      { href: "/testorders", label: "Orders", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" />, privilegeId: 1 },
-      { href: "/testorderResult", label: "Results", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" />, privilegeId: 1 },
-    ],
-  },
-];
-
-// Helper function to recursively filter the sidebar items based on privileges
-const filterMenuItems = (items: NavItem[], privileges: Set<number>): NavItem[] => {
-  return items
-    .map(item => {
-      // Create a copy of the item to avoid direct mutation
-      const newItem = { ...item };
-
-      // If the item has children, filter them recursively
-      if (newItem.children) {
-        newItem.children = filterMenuItems(newItem.children, privileges);
-      }
-
-      // Check if the item should be included in the final menu
-      // FIX: Add a check for newItem.privilegeId !== undefined to satisfy the type checker.
-      const hasPrivilege = newItem.privilegeId === null || (newItem.privilegeId !== undefined && privileges.has(newItem.privilegeId));
-      const hasVisibleChildren = newItem.children && newItem.children.length > 0;
-
-      // The item is included if it meets the privilege requirement OR
-      // if it's a parent item with at least one visible child.
-      if (hasPrivilege || hasVisibleChildren) {
-        return newItem;
-      }
-
-      // Return null to filter out this item
-      return null;
-    })
-    .filter((item): item is NavItem => item !== null); // Filter out null items
-};
-
+/**
+ * The main Sidebar component that dynamically builds its content based on
+ * privileges stored in localStorage.
+ */
 export const Sidebar = () => {
-  const [userPrivileges, setUserPrivileges] = useState<Set<number>>(new Set());
-  const [isLoading, setIsLoading] = useState(true);
+  const [items, setItems] = useState<NavItem[]>([]);
 
   useEffect(() => {
-    const storedUserData = localStorage.getItem("userData"); // Assuming you store the user data here
-    if (storedUserData) {
+    // Get the privilege IDs from localStorage
+    const storedPrivileges = localStorage.getItem("privilege_ids");
+    let privilegeSet = new Set<number>();
+
+    if (storedPrivileges) {
       try {
-        const userData = JSON.parse(storedUserData);
-        // Assuming your backend response has a "privilege_ids" key with a Set<Long>
-        if (userData.privilege_ids) {
-          // Convert the array of IDs to a Set for efficient lookups
-          setUserPrivileges(new Set(userData.privilege_ids));
+        const parsedPrivileges = JSON.parse(storedPrivileges);
+        if (Array.isArray(parsedPrivileges)) {
+          privilegeSet = new Set(parsedPrivileges);
         }
       } catch (e) {
-        console.error("Invalid user data in localStorage", e);
+        console.error("Invalid privilege_ids in localStorage", e);
       }
     }
-    setIsLoading(false);
+
+    const dynamicItems: NavItem[] = [];
+
+    // Always show the Dashboard link
+    dynamicItems.push({
+      href: "/dashboard",
+      label: "Dashboard",
+      icon: <Squares2X2Icon className="h-5 w-5 text-gray-500" />
+    });
+    
+    // Conditionally add 'Patients' and 'Testorder' based on privilege_id 1
+    // Note: The user's request links multiple items to a single ID.
+    // In a more robust system, each item would have its own privilege.
+    if (privilegeSet.has(1)) {
+        dynamicItems.push({
+          href: "/patients",
+          label: "Patients",
+          icon: <UsersIcon className="h-5 w-5 text-gray-500" />
+        });
+        
+        // Build the nested 'Testorder' menu
+        dynamicItems.push({
+          href: "#",
+          label: "Testorder",
+          icon: <BeakerIcon className="h-5 w-5 text-gray-500" />,
+          children: [
+            { href: "/testorders", label: "Orders", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
+            { href: "/testorderResult", label: "Results", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
+          ],
+        });
+    }
+
+    // Build the nested 'IAM' menu based on privileges 13 and 18
+    const iamChildren: NavItem[] = [];
+    if (privilegeSet.has(13)) { // 'VIEW_USER'
+        iamChildren.push({ href: "/iam/users", label: "Users", icon: <UsersIcon className="h-5 w-5 text-gray-500" /> });
+    }
+    if (privilegeSet.has(18)) { // 'VIEW_ROLE'
+        iamChildren.push({ href: "/iam/roles", label: "Roles", icon: <TagIcon className="h-5 w-5 text-gray-500" /> });
+    }
+    if (iamChildren.length > 0) {
+      dynamicItems.push({
+        href: "##",
+        label: "IAM",
+        icon: <FingerPrintIcon className="h-5 w-5 text-gray-500" />,
+        children: iamChildren,
+      });
+    }
+
+    setItems(dynamicItems);
+
   }, []);
-
-  // Filter the master list based on the user's privileges
-  const items = filterMenuItems(MASTER_SIDEBAR_ITEMS, userPrivileges);
-
-  // You can render a loading state if needed
-  if (isLoading) {
-    return (
-      <aside className="w-64 bg-white border-r border-gray-200 h-screen fixed overflow-y-auto">
-        <div className="p-6 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 calistoga-regular">Healthcare</h1>
-        </div>
-        <div className="flex justify-center items-center h-full">
-          <p>Loading...</p>
-        </div>
-      </aside>
-    );
-  }
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 h-screen fixed overflow-y-auto">
@@ -261,7 +238,7 @@ export const Sidebar = () => {
       {/* Separator Line */}
       <hr className="my-6 mx-4 border-t border-gray-200" />
 
-      {/* Static items for all authenticated users */}
+      {/* Settings, Helping Center, and Sign Out section (Always visible) */}
       <nav className="px-4 space-y-1">
         <SidebarItem
           item={{ href: "/settings", label: "Settings", icon: <Cog6ToothIcon className="h-5 w-5 text-gray-500" /> }}

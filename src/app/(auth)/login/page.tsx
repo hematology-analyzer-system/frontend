@@ -45,8 +45,8 @@ export default function LoginPage() {
 
         const roleData = await response2.json();
         if (response2.ok) {
-          localStorage.setItem('status', roleData.status);
-          localStorage.setItem('roles', JSON.stringify(roleData.roles));
+          localStorage.setItem('fullName', JSON.stringify(roleData.fullName));
+          localStorage.setItem('email', JSON.stringify(roleData.email));
           localStorage.setItem('privilege_ids', JSON.stringify(roleData.privilege_ids));
         }
 

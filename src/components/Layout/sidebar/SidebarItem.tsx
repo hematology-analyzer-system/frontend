@@ -70,6 +70,7 @@
 //   );
 // };
 
+
 "use client";
 
 import { useState } from "react";
@@ -86,7 +87,6 @@ interface NavItem {
   href: string;
   label: string;
   icon: React.ReactNode;
-  privilegeId?: number | null; // Added to match the new data structure
   children?: NavItem[];
 }
 
@@ -94,6 +94,9 @@ interface SidebarItemProps {
   item: NavItem;
 }
 
+/**
+ * A component for a single sidebar item, with support for nested children.
+ */
 export const SidebarItem = ({ item }: SidebarItemProps) => {
   const pathname = usePathname();
   const isActive = item.href === pathname;
