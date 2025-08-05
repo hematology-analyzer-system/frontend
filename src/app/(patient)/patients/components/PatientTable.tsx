@@ -37,6 +37,19 @@ const handleCreate = async (id: Number) => {
 
 const PatientTable: FC<Props> = ({ data, reload }) => {
   const [showNew, setShowNew] = useState(false);
+  const storedRoles = localStorage.getItem("privilege_ids");
+  const hasCreatePrivilege = storedRoles && JSON.parse(storedRoles).includes(2);
+
+// Dynamic headers based on privileges
+  const getTableHeaders = () => {
+  const baseHeaders = ['Patient name', 'Age', 'Gender', 'Email', 'Phone', 'Address'];
+  const endHeaders = ['View'];
+  
+  if (hasCreatePrivilege) {
+    return [...baseHeaders, 'New Testorder', ...endHeaders];
+  }
+  return [...baseHeaders, ...endHeaders];
+};
   return (
     <div className="max-w-6xl mx-auto">
 
@@ -48,59 +61,58 @@ const PatientTable: FC<Props> = ({ data, reload }) => {
       {/* Bảng Test Orders */}
       <div className="p-4 overflow-auto">
         <table className="min-w-full bg-white rounded-lg shadow">
-          <thead className="bg-gray-100">
-            <tr>
-              {/* <th className="p-2"><input type="checkbox" /></th> */}
-              {['Patient name','Age','Gender','Email','Phone','Address','New Testorder','View'].map(h => (
-                <th
-                  key={h}
-                  className="p-2 text-left text-sm font-medium text-gray-600"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          {data.length === 0 ? (
-  <tbody>
-    <tr>
-      <td colSpan={9} className="p-8 text-center text-gray-500">
-        No data
-      </td>
-    </tr>
-  </tbody>
-) : (
-  <tbody>
-    {data.map(o => (
-      <tr key={o.id} className="border-t hover:bg-green-50">
-        <td className="p-2">{o.fullName}</td>
-        <td className="p-2">{new Date().getFullYear() - new Date(o.dateOfBirth).getFullYear()}</td>
-        <td className="p-2">{o.gender}</td>
-        <td className="p-2">{o.email}</td>
-        <td className="p-2">{o.phone}</td>
-        <td className="p-2">{o.address}</td>
-        <td className="p-2">
-            <button
-              onClick={() => handleCreate(o.id)}
-              className="px-3 py-1 bg-green-500 text-white rounded hover:bg-blue-700"
-            >
-              Create
-            </button>
-        </td>
-        {/* <td className="p-2">{new Date(o.createdAt).toLocaleDateString()}</td>
-        <td className="p-2">{new Date(o.updatedAt).toLocaleDateString()}</td> */}
-        <td className="p-2">
-          <Link href={`/patients/${o.id}`}>
-            <button className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-              View
-            </button>
-          </Link>
-        </td>
+    <thead className="bg-gray-100">
+      <tr>
+        {getTableHeaders().map(h => (
+          <th
+            key={h}
+            className="p-2 text-left text-sm font-medium text-gray-600"
+          >
+            {h}
+          </th>
+        ))}
       </tr>
-    ))}
-  </tbody>
-)}
-        </table>
+    </thead>
+    {data.length === 0 ? (
+      <tbody>
+        <tr>
+          <td colSpan={hasCreatePrivilege ? 8 : 7} className="p-8 text-center text-gray-500">
+            No data
+          </td>
+        </tr>
+      </tbody>
+    ) : (
+      <tbody>
+        {data.map(o => (
+          <tr key={o.id} className="border-t hover:bg-green-50">
+            <td className="p-2">{o.fullName}</td>
+            <td className="p-2">{new Date().getFullYear() - new Date(o.dateOfBirth).getFullYear()}</td>
+            <td className="p-2">{o.gender}</td>
+            <td className="p-2">{o.email}</td>
+            <td className="p-2">{o.phone}</td>
+            <td className="p-2">{o.address}</td>
+            {hasCreatePrivilege && (
+              <td className="p-2">
+                <button
+                  onClick={() => handleCreate(o.id)}
+                  className="px-3 py-1 bg-green-500 text-white rounded hover:bg-blue-700"
+                >
+                  Create
+                </button>
+              </td>
+            )}
+            <td className="p-2">
+              <Link href={`/patients/${o.id}`}>
+                <button className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
+                  View
+                </button>
+              </Link>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    )}
+  </table>
       </div>
 
       {/* Modal tạo new patient */}

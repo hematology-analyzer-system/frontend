@@ -13,7 +13,7 @@ export default function TestOrderPage() {
   const [pageData, setPageData] = useState<PageFilter<TestOrder> | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const size = 5;
+  const size = 20;
   const [searchText, setSearchText] = useState('');
   const [sortKey, setSortKey] = useState<'nameAsc' | 'nameDesc'>('nameAsc');
   

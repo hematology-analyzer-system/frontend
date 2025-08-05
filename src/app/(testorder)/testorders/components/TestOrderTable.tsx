@@ -7,7 +7,7 @@ import { TestOrder } from '../fetch';
 import Header from './Header';
 
 import NewTestOrderModal from './NewTestOrderModel';
-import OldTestOrderModal from './OldTestOrderModel';
+// import OldTestOrderModal from './OldTestOrderModel';
 
 interface Props {
   data: TestOrder[];
@@ -22,15 +22,14 @@ function extractIdNum(runBy: string | null): string | null {
 }
 const TestOrderTable: FC<Props> = ({ data, reload }) => {
   const [showNew, setShowNew] = useState(false);
-  const [showOld, setShowOld] = useState(false);
+  // const [showOld, setShowOld] = useState(false);
+  
 
   return (
     <div className="max-w-6xl mx-auto">
 
       {/* Header với 2 nút New/Old */}
-      <Header onNew={() => setShowNew(true)} onOld={() => setShowOld(true)} />
-
-      
+      <Header onNew={() => setShowNew(true)} />
 
       {/* Bảng Test Orders */}
       <div className="p-4 overflow-auto">
@@ -100,13 +99,13 @@ const TestOrderTable: FC<Props> = ({ data, reload }) => {
         />
       )}
 
-      {/* Modal tạo old patient */}
+      {/* Modal tạo old patient
       {showOld && (
         <OldTestOrderModal
           onClose={() => setShowOld(false)}
           onCreated={() => { setShowOld(false); reload(); }}
         />
-      )}
+      )} */}
     </div>
   );
 };

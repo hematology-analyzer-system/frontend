@@ -16,6 +16,12 @@ export default function TestOrderDetailPage() {
   const [editingComment, setEditingComment] = useState<CommentTO | null>(null);
   const [showEdit, setShowEdit]             = useState(false);
   const [commentText, setText]  = useState('');
+  const storedRoles = localStorage.getItem("privilege_ids");
+  const hasModifyPrivilege = storedRoles && JSON.parse(storedRoles).includes(3);
+  const hasDeletePrivilege = storedRoles && JSON.parse(storedRoles).includes(4);
+  const hasAddCommentPrivilege = storedRoles && JSON.parse(storedRoles).includes(6);
+  const hasModifyCommentPrivilege = storedRoles && JSON.parse(storedRoles).includes(7);
+  const hasDeleteCommentPrivilege = storedRoles && JSON.parse(storedRoles).includes(8);
   function extractIdNum(runBy: string | null): string | null {
   if (!runBy) {
     return null
@@ -205,7 +211,7 @@ export default function TestOrderDetailPage() {
               onClick={handleUpdate}
               className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >Update detail</button> */}
-            {order.status === 'PENDING'  ? (
+            {order.status === 'PENDING' && hasModifyPrivilege ? (
           /* Nếu đã completed: show View Results */
           <button
             onClick={handleGenerate}
@@ -223,10 +229,10 @@ export default function TestOrderDetailPage() {
             View Results
           </button>
         )}
-            <button
+            {hasDeletePrivilege && (<button
               onClick={handleDelete}
               className="px-5 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >Delete</button>
+            >Delete</button>)}
           </div>
         </div>
 
@@ -253,30 +259,30 @@ export default function TestOrderDetailPage() {
 
             {/* Hai nút Modify / Delete ở bên phải */}
             <div className="flex space-x-2">
-              <button
+              {hasModifyCommentPrivilege && (<button
                 onClick={() => handleModifyComment(c.id)}
                 className="px-2 py-1 text-sm text-blue-600 hover:text-blue-800"
               >
                 <Edit size={14}></Edit>
-              </button>
-              <button
+              </button>)}
+              {hasDeleteCommentPrivilege && (<button
                 onClick={() => handleDeleteComment(c.id)}
                 className="px-2 py-1 text-sm text-red-600 hover:text-red-800"
               >
                 <Trash size={14}></Trash>
-              </button>
+              </button>)}
             </div>
           </div>
 
             ))
           )}
 
-          <button
+          {hasAddCommentPrivilege && (<button
             onClick={() => setAdding(true)}
             className="mt-2 px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Add comment
-          </button>
+          </button>)}
         </div>
       </div>
 

@@ -20,6 +20,12 @@ export default function TestOrderResultsPage() {
   const [editMode, setEditMode]       = useState(false);
   const [editedValues, setEditedValues] = useState<number[]>([]);
   const [showPDFOptions, setShowPDFOptions] = useState(false);
+  const storedRoles = localStorage.getItem("privilege_ids");
+  const hasModifyResultPrivilege = storedRoles && JSON.parse(storedRoles).includes(5);
+  const hasDeletePrivilege = storedRoles && JSON.parse(storedRoles).includes(4);
+  const hasAddCommentPrivilege = storedRoles && JSON.parse(storedRoles).includes(6);
+  const hasModifyCommentPrivilege = storedRoles && JSON.parse(storedRoles).includes(7);
+  const hasDeleteCommentPrivilege = storedRoles && JSON.parse(storedRoles).includes(8);
   function extractIdNum(runBy: string | null): string | null {
   if (!runBy) {
     return null
@@ -230,7 +236,6 @@ export default function TestOrderResultsPage() {
   const results = order.results;
   const result: Result  = results[selected];
   const details = result.detailResults as ResultDetails[];
-  console.log(result);
   // mỗi lần chuyển tab result, reset editedValues
   
 
@@ -317,7 +322,7 @@ export default function TestOrderResultsPage() {
               </>
             ) : (
               <>
-                {!editMode && order.status.toLowerCase() !== 'reviewed' && (
+                {!editMode && order.status.toLowerCase() !== 'reviewed' && hasModifyResultPrivilege && (
                   <button
                     onClick={() => setEditMode(true)}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -325,7 +330,7 @@ export default function TestOrderResultsPage() {
                     Update detail
                   </button>
                 )}
-            <button
+            {hasDeletePrivilege && (<button
               onClick={async () => {
                 // DELETE result
                 await fetch(`${BASE}/result/${result.id}`, { method: 'DELETE',credentials: 'include' });
@@ -339,7 +344,7 @@ export default function TestOrderResultsPage() {
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
               Delete
-            </button>
+            </button>)}
             <div className="relative">
                   <button
                     onClick={() => setShowPDFOptions(!showPDFOptions)}
@@ -419,29 +424,29 @@ export default function TestOrderResultsPage() {
 
             {/* Hai nút Modify / Delete ở bên phải */}
             <div className="flex space-x-2">
-              <button
+              {hasModifyCommentPrivilege &&(<button
                 onClick={() => handleModifyComment(c.id)}
                 className="px-2 py-1 text-sm text-blue-600 hover:text-blue-800"
               >
                 <Edit size={14}></Edit>
-              </button>
-              <button
+              </button>)}
+              {hasDeleteCommentPrivilege && (<button
                 onClick={() => handleDeleteComment(c.id)}
                 className="px-2 py-1 text-sm text-red-600 hover:text-red-800"
               >
                 <Trash size={14}></Trash>
-              </button>
+              </button>)}
             </div>
           </div>
             ))
           }
 
-          <button
+          { hasAddCommentPrivilege && (<button
             onClick={() => setShowAdd(true)}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Add comment
-          </button>
+          </button>)}
         </div>
       </div>
       {showPDFOptions && (

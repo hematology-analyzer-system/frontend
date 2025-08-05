@@ -9,6 +9,9 @@ import LogoutButton from "@/components/Button/logoutBtn";
 export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
   const [formData, setFormData] = useState(patient);
   const [edited, setEdited] = useState(false);
+  const storedRoles = localStorage.getItem("privilege_ids");
+  const hasDeletePrivilege = storedRoles && JSON.parse(storedRoles).includes(4);
+  const hasModifyPrivilege = storedRoles && JSON.parse(storedRoles).includes(3);
   const [editMode, setEditMode] = useState<Record<keyof Patient, boolean>>({
     fullName: false,
     address: false,
@@ -143,7 +146,7 @@ const renderField = (
           <p>{formData[field]}</p>
         )}
 
-        {isEditable && !editMode[field] && (
+        {hasModifyPrivilege && isEditable && !editMode[field] && (
           <button
             type="button"
             onClick={() => toggleEdit(field)}
@@ -186,17 +189,18 @@ const renderField = (
       )} */}
 
       <div className="flex justify-between pt-4">
-        <button
+        {hasDeletePrivilege && (<button
           onClick={handleDelete}
           className="inline-flex items-center space-x-2 bg-red-500 text-white font-medium px-5 py-2 rounded-full shadow hover:bg-red-600 transition"
         >
           <TrashIcon className="h-5 w-5" / >
           Delete Patient
         </button>
+        )}
 
         {/* <LogoutButton></LogoutButton> */}
 
-        {edited && (
+        {hasModifyPrivilege && edited && (
           <button
             onClick={handleSave}
             className="bg-blue-600 text-white font-medium px-5 py-2 rounded-full shadow hover:bg-blue-700 transition"
