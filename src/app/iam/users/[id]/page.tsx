@@ -20,7 +20,8 @@ export default function SingleUserDetailsPage({ params }: UserDetailsProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // No longer need crawlObject as we know the structure now
+  // State to manage feedback messages shown in the UI
+  const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const fetchUserDetails = useCallback(async (id: number) => {
     setLoading(true);
@@ -38,9 +39,11 @@ export default function SingleUserDetailsPage({ params }: UserDetailsProps) {
 
       const data: UserResponseDTO = await res.json();
       setUser(data);
+      setFeedback(null); // Clear any previous feedback on successful fetch
     } catch (err) {
       console.error("Error fetching user details:", err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+      setFeedback({ message: err instanceof Error ? err.message : 'An unknown error occurred.', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -52,10 +55,11 @@ export default function SingleUserDetailsPage({ params }: UserDetailsProps) {
     }
   }, [userId, fetchUserDetails]);
 
-  const handleSaveUserDetails = async (updatedUser: UserResponseDTO) => {
-    try {
-      setLoading(true);
 
+  const handleSaveUserDetails = async (updatedUser: UserResponseDTO) => {
+    setLoading(true);
+    setFeedback(null); // Clear old feedback
+    try {
       const updatePayload = {
         fullName: updatedUser.fullName,
         date_of_Birth: updatedUser.date_of_Birth,
@@ -63,9 +67,8 @@ export default function SingleUserDetailsPage({ params }: UserDetailsProps) {
         address: updatedUser.address,
         gender: updatedUser.gender,
         phone: updatedUser.phone,
-        status: updatedUser.status,
         identifyNum: updatedUser.identifyNum,
-        roleIds: updatedUser.roleIds, // Now sending roleIds
+        roleIds: updatedUser.roleIds,
       };
 
       console.log("Sending payload to backend:", updatePayload);
@@ -96,21 +99,54 @@ export default function SingleUserDetailsPage({ params }: UserDetailsProps) {
         throw new Error(errorMessage);
       }
 
-      // Re-fetch user details to get the most updated state from the backend
-      // This will also cause UserDetailsPage to re-render with fresh data and exit edit mode.
       await fetchUserDetails(userId);
-      alert('User updated successfully!');
+      setFeedback({ message: 'User updated successfully!', type: 'success' });
 
     } catch (err) {
       console.error("Error saving user details:", err);
-      setError(err instanceof Error ? err.message : 'Failed to save user details.');
+      setFeedback({ message: err instanceof Error ? err.message : 'Failed to save user details.', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateUserStatus = async (isLock: boolean) => {
+    setLoading(true);
+    setFeedback(null); // Clear old feedback
+    try {
+      // Corrected payload key and URL logic
+      const status = isLock ? 'unlock' : 'lock';
+      const res = await fetch(`http://localhost:8080/iam/users/${params.id}/${status}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        let errorMessage = 'Failed to update user status.';
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorData.error || JSON.stringify(errorData);
+        } catch {
+          errorMessage = await res.text() || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      await fetchUserDetails(userId);
+      setFeedback({ message: 'User status updated successfully!', type: 'success' });
+      
+    } catch (err) {
+      console.error("Error updating user status:", err);
+      setFeedback({ message: err instanceof Error ? err.message : 'An unknown error occurred while updating status.', type: 'error' });
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancelUserDetails = () => {
-    // When cancelled, we just go back. UserDetailsPage handles reverting its own state.
     router.back();
   };
 
@@ -129,7 +165,22 @@ export default function SingleUserDetailsPage({ params }: UserDetailsProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-sm text-gray-500 mb-4">IAM / Users / {user.fullName}</div>
-      <UserDetailsPage user={user} onSave={handleSaveUserDetails} onCancel={handleCancelUserDetails} />
+      {/* Display feedback message if available */}
+      {feedback && (
+        <div
+          className={`mb-4 p-4 rounded-md ${
+            feedback.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+          }`}
+        >
+          <p>{feedback.message}</p>
+        </div>
+      )}
+      <UserDetailsPage
+        user={user}
+        onSave={handleSaveUserDetails}
+        onCancel={handleCancelUserDetails}
+        onUpdateStatus={handleUpdateUserStatus}
+      />
     </div>
   );
 }
