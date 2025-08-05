@@ -79,6 +79,25 @@ export default function PatientPage(){
         
         />
         <PatientTable data={patientData} reload={fetchFiltered}/>
+        <div className="flex justify-between items-center p-4">
+        <button
+          onClick={() => setPage(p => Math.max(p - 1, 0))}
+          disabled={pageData.first}
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span>
+          Page {pageData.number + 1} / {pageData.totalPages}
+        </span>
+        <button
+          onClick={() => setPage(p => p + 1)}
+          disabled={pageData.last}
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
         </div>
 
     )
