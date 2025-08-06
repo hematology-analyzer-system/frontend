@@ -22,6 +22,7 @@
 import { useEffect, useState } from "react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import React from "react";
+import NotificationBell from "../Notification/NotificationBell";
 
 export const Navbar = () => {
   const [fullName, setFullName] = useState<string | null>(null);
@@ -43,14 +44,23 @@ export const Navbar = () => {
   }, []); // The empty dependency array ensures this runs only once on mount.
 
   return (
-    <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
+    <div className="flex justify-between items-center px-6 py-2 bg-[#fff] sticky top-0 shadow-sm z-10">
       <div>
         <span className="text-sm text-gray-500">Healthcare Services System</span>
         <h1 className="text-lg font-bold">Group 2</h1>
       </div>
-      <div className="flex items-center space-x-2">
-        <UserCircleIcon className="h-6 w-6 text-black" />
-        <span className="text-sm font-medium">{fullName}</span>
+
+      <div className="relative flex flex-row gap-x-5">
+        {/* Notification */}
+        <div className="relative pt-2">
+          <NotificationBell />
+        </div>
+
+        {/* User */}
+        <div className="flex items-center space-x-2">
+          <UserCircleIcon className="h-6 w-6 text-black" />
+          <span className="text-sm font-medium">{fullName}</span>
+        </div>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   );
 
   if (isProtected && !token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/errors/401", request.url));
   }
 
   return NextResponse.next();

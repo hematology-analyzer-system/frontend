@@ -1,5 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Calistoga&family=Imprima&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Calistoga&family=Imprima&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   /* ==== Màu chủ đạo ==== */
@@ -22,11 +24,12 @@
 
   /* ==== Màu nền ==== */
   --color-background: #f3f3e0;
+  --color-background-light: #f1f1f1f1;
   --color-surface: #ffffff;
   --color-surface-subtle: #cbdceb;
-  --color-background-dark: #121212;
-  --color-surface-dark: #1e1e1e;
-  --color-surface-subtle-dark: #2a2f38;
+  --color-background-dark: #1d1d1d;
+  --color-surface-dark: #2d2d2d;
+  --color-surface-subtle-dark: #343a45;
 
   /* ==== Màu văn bản ==== */
   --color-text-primary: #1a1a1a;
@@ -46,35 +49,251 @@
 }
 
 @layer base {
+  * {
+    padding: 0;
+    margin: 0;
+  }
+
   html {
     scroll-behavior: smooth;
+    /* font-family: "Montserrat"; */
   }
 
   body {
-    background-color: var(--color-background);
+    background-image: linear-gradient(145deg, #f3f3e0, #daf3ed50, #c4e8f7);
     color: var(--color-text-primary);
   }
 
   .dark body {
-    background-color: var(--color-background-dark);
+    background-image: linear-gradient(
+      145deg,
+      #0f2027,
+      #203a43,
+      #2c5364,
+      #0b8793
+    );
     color: var(--color-text-primary-dark);
+  }
+
+  fieldset {
+    @apply border-[1.5px] border-primary dark:border-primary-dark rounded-3xl px-5;
+  }
+
+  legend {
+    @apply text-[12px] md:text-[15px] font-normal text-text-primary dark:text-text-primary-dark mx-1 px-2;
+  }
+
+  table {
+    @apply w-full h-auto relative p-5 rounded-3xl;
+  }
+
+  thead {
+    @apply w-full border-b border-b-text-muted;
+  }
+
+  tr {
+    @apply overflow-hidden relative
+  odd:bg-[#b0b0b015] hover:bg-surface-subtle dark:hover:bg-surface-subtle-dark transition-all duration-25;
+  }
+
+  th {
+    @apply px-3 py-2 font-semibold max-w-[200px]
+    text-[12px] md:text-[15px] text-text-primary dark:text-text-primary-dark;
+  }
+
+  td {
+    @apply text-center py-1.5 max-w-[200px] overflow-hidden 
+    text-[10px] md:text-[13px] font-normal text-text-primary dark:text-text-primary-dark;
   }
 }
 
 @layer components {
   .button {
-    @apply w-full py-3 px-6 rounded-xl font-semibold bg-primary text-white hover:bg-primary-darker dark:bg-primary-dark dark:hover:bg-primary-darker-dark transition-all cursor-pointer;
+    @apply w-full py-3 px-6 rounded-full font-semibold bg-gradient-to-r from-primary to-primary-light text-white 
+         hover:from-primary-darker hover:to-primary-darker hover:inset-shadow-xs
+         dark:from-primary-dark dark:to-primary-light
+         dark:hover:from-primary-darker-dark dark:hover:to-primary-darker
+         transition-all cursor-pointer;
+    box-shadow: 3 3 10px rgba(0, 0, 0, 0.2);
+  }
+  .button:hover {
+    box-shadow: inset 3 3 10px rgba(0, 0, 0, 0.3);
+    transition: all;
+    transition-duration: 200ms;
   }
 
   .outline-button {
-    @apply w-full py-3 px-6 rounded-xl font-semibold border-1 border-primary dark:border-primary-dark bg-none hover:border-primary-darker text-primary dark:text-primary-dark hover:text-primary-darker dark:hover:text-primary-darker-dark dark:hover:border-primary-darker transition-all cursor-pointer;
+    @apply w-full py-3 px-6 rounded-full bg-none
+    font-semibold box-border 
+    border-1 border-primary dark:border-primary-dark hover:border-primary-darker
+    text-primary dark:text-primary-dark 
+    hover:text-primary-darker dark:hover:text-primary-darker-dark 
+    
+    dark:hover:border-primary-darker 
+    transition-all 
+    cursor-pointer;
+  }
+
+  /* ===========================
+      Liquid style elements
+  =========================== */
+  .liquid-element {
+    @apply w-full h-full rounded-full font-semibold text-white transition-all relative overflow-hidden backdrop-blur-[10px];
+
+    background: rgba(255, 255, 255, 0.1);
+    /* backdrop-filter: blur(10px); */
+    /* -webkit-backdrop-filter: blur(10px); */
+
+    /* Drop shadow */
+    box-shadow: inset 2px 4px 10px -4px rgba(255, 255, 255, 1),
+      4px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      inset -2px -4px 12px -7px rgba(0, 0, 0, 0.25);
+  }
+
+  .liquid-element::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 0.5px;
+    background: linear-gradient(
+      245deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0.05)
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Variant: soft blur */
+  .liquid-element--soft {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Variant: medium blur */
+  .liquid-element--medium {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Variant: strong blur */
+  .liquid-element--strong {
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  /* Liquid button style */
+  .liquid-button {
+    @apply w-full px-6 py-3 rounded-full font-semibold text-white cursor-pointer transition-all relative overflow-hidden backdrop-blur-[1px];
+
+    background: rgba(255, 255, 255, 1);
+
+    /* Drop shadow */
+    box-shadow: inset 2px 4px 10px -4px rgba(255, 255, 255, 0.95),
+      4px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      inset -2px -4px 12px -7px rgba(0, 0, 0, 0.25);
+  }
+
+  .liquid-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 0.5px;
+    background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0.232)
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .liquid-button:hover {
+    box-shadow: inset 2px 4px 12px -4px rgba(255, 255, 255, 0.4),
+      4px 4px 8px 0 rgba(0, 0, 0, 0.25),
+      inset -2px -4px 12px -7px rgba(0, 0, 0, 0.35);
+  }
+
+  .liquid-button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .liquid-button:hover::after {
+    animation: shimmer 0.8s forwards;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
   }
 
   .input {
-    @apply w-full py-2.5 bg-background dark:bg-background-dark rounded-lg px-5 focus:outline-none
+    @apply w-full bg-background dark:bg-surface-subtle-dark rounded-full px-5 focus:outline-none 
+    text-text-secondary dark:text-text-secondary-dark
+    text-[12px] md:text-[15px] font-normal;
   }
-  
-  .title {
-    @apply text-3xl font-bold text-text-primary dark:text-text-primary-dark
+
+  .text-title {
+    @apply text-2xl md:text-3xl font-bold text-text-primary dark:text-text-primary-dark;
   }
+
+  .text-subTitle {
+    @apply text-[17px] md:text-[20px] font-semibold text-text-primary dark:text-text-primary-dark;
+  }
+
+  .text-normal {
+    @apply text-[12px] md:text-[15px] font-normal text-text-primary dark:text-text-primary-dark;
+  }
+
+  .text-small {
+    @apply text-[10px] md:text-[13px] font-normal text-text-primary dark:text-text-primary-dark;
+  }
+
+  .text-error {
+    @apply text-[12px] md:text-[14px] font-light text-danger dark:text-danger-dark;
+  }
+}
+
+@utility background-gradient {
+  background-image: linear-gradient(145deg, #f3f3e0, #daf3ed50, #c4e8f7);
+}
+
+@utility background-gradient-none {
+  background-image: none;
+}
+
+@utility background-gradient-dark {
+  /* background-image: linear-gradient(145deg, #041C46, #195760, #3cba92); */
+
+  background-image: linear-gradient(145deg, #0f2027, #203a43, #2c5364, #0b8793);
+
+  /* background-image: linear-gradient(160deg, #2b5876, #4e4376, #2c3e50, #1f1c2c); */
+
+  /* background: linear-gradient(to left, #0f2027, #2c5364, #203a43); */
 }
