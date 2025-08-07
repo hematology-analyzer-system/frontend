@@ -1,9 +1,12 @@
 "use client";
 
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import UserDetailsPage from '@/components/users/UserDetailsPage';
 import { UserResponseDTO } from '@/type/user';
+import { useNotification } from '@/context/NotificationContext';
 
 interface UserDetailsRouteParams {
   id: string;
@@ -54,6 +57,98 @@ export default function SingleUserDetailsPage({ params }: UserDetailsProps) {
       fetchUserDetails(userId);
     }
   }, [userId, fetchUserDetails]);
+
+  const { setNotifications } = useNotification();
+
+  useEffect(() => {
+    // Setup WebSocket connection for real-time notifications
+    const socket = new SockJS('http://localhost:8080/iam/ws');
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      reconnectDelay: 5000,
+      onConnect: () => {
+        stompClient.subscribe('/topic/userLocked', (message) => {
+          if (message.body) {
+            try {
+              const auditLog = JSON.parse(message.body);
+              const userName = auditLog.fullName || auditLog.details || 'A user';
+              setNotifications((prev: any) => [
+                ...prev,
+                {
+                  id: Date.now(),
+                  message: `User "${userName}" has been locked!`,
+                  timestamp: new Date().toLocaleString(),
+                },
+              ]);
+            } catch (e) {
+              setNotifications((prev: any) => [
+                ...prev,
+                {
+                  id: Date.now(),
+                  message: 'A user has been locked.',
+                  timestamp: new Date().toLocaleString(),
+                },
+              ]);
+            }
+          }
+        });
+        stompClient.subscribe('/topic/userUnlocked', (message) => {
+          if (message.body) {
+            try {
+              const auditLog = JSON.parse(message.body);
+              const userName = auditLog.fullName || auditLog.details || 'A user';
+              setNotifications((prev: any) => [
+                ...prev,
+                {
+                  id: Date.now(),
+                  message: `User "${userName}" has been unlocked!`,
+                  timestamp: new Date().toLocaleString(),
+                },
+              ]);
+            } catch (e) {
+              setNotifications((prev: any) => [
+                ...prev,
+                {
+                  id: Date.now(),
+                  message: 'A user has been unlocked.',
+                  timestamp: new Date().toLocaleString(),
+                },
+              ]);
+            }
+          }
+        });
+        stompClient.subscribe('/topic/userDeleted', (message) => {
+          if (message.body) {
+            try {
+              const auditLog = JSON.parse(message.body);
+              const userName = auditLog.fullName || auditLog.details || 'A user';
+              setNotifications((prev: any) => [
+                ...prev,
+                {
+                  id: Date.now(),
+                  message: `User "${userName}" has been deleted!`,
+                  timestamp: new Date().toLocaleString(),
+                },
+              ]);
+            } catch (e) {
+              setNotifications((prev: any) => [
+                ...prev,
+                {
+                  id: Date.now(),
+                  message: 'A user has been deleted.',
+                  timestamp: new Date().toLocaleString(),
+                },
+              ]);
+            }
+          }
+        });
+      },
+    });
+    stompClient.activate();
+    return () => {
+      stompClient.deactivate();
+    };
+  }, [setNotifications]);
 
 
   const handleSaveUserDetails = async (updatedUser: UserResponseDTO) => {
