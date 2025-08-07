@@ -38,7 +38,19 @@ export default function NotificationItem({ notificationItem }: Props) {
     const handleOnClick = () => {
         setOpen(false);
         markAsRead(notificationItem.id);
-        router.replace(`/patients/${notificationItem.entityId}`);
+        
+        // Determine redirect path based on entity type
+        if (notificationItem.entityType === "USER") {
+            // Redirect to user details page for IAM notifications
+            router.replace(`/iam/users/${notificationItem.entityId}`);
+        } else if (notificationItem.entityType === "PATIENT" || notificationItem.entityType === "PATIENT_ORDER") {
+            // Redirect to patient details page for patient notifications
+            router.replace(`/patients/${notificationItem.entityId}`);
+        } else {
+            // Default behavior for unknown entity types
+            console.warn(`Unknown entity type: ${notificationItem.entityType}`);
+            // You could add a fallback behavior here if needed
+        }
     };
 
     return (

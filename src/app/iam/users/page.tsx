@@ -321,8 +321,6 @@
 // src/app/(iam)/users/page.tsx
 "use client";
 
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import UserCard from '@/components/Card/UserCard';
@@ -332,7 +330,6 @@ import UserForm from '@/components/Form/UserForm';
 import { UserResponseDTO, PageResponse, RoleResponseDTO, CreateUserRequest } from '@/type/user';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
-import { useNotification } from '@/context/NotificationContext';
 
 export default function UsersPage() {
   const router = useRouter();
@@ -461,118 +458,6 @@ export default function UsersPage() {
     fetchUsers();
     fetchAllRoles();
   }, [fetchUsers, fetchAllRoles]);
-
-  const { setNotifications } = useNotification();
-
-  useEffect(() => {
-    // Setup WebSocket connection and subscribe to /topic/userCreated and /topic/userLocked
-    const socket = new SockJS('http://localhost:8080/iam/ws');
-    const stompClient = new Client({
-      webSocketFactory: () => socket,
-      reconnectDelay: 5000,
-      onConnect: () => {
-        stompClient.subscribe('/topic/userCreated', (message) => {
-          if (message.body) {
-            const user = JSON.parse(message.body);
-            setNotifications((prev: any) => [
-              ...prev,
-              {
-                id: Date.now(),
-                message: `New user "${user.fullName}" created!`,
-                timestamp: new Date().toLocaleString(),
-              },
-            ]);
-          }
-        });
-        stompClient.subscribe('/topic/userDeleted', (message) => {
-          // The backend sends a UserAuditLog object
-          if (message.body) {
-            try {
-              const auditLog = JSON.parse(message.body);
-              const userName = auditLog.fullName || auditLog.details || 'A user';
-              setNotifications((prev: any) => [
-                ...prev,
-                {
-                  id: Date.now(),
-                  message: `User "${userName}" has been deleted!`,
-                  timestamp: new Date().toLocaleString(),
-                },
-              ]);
-              // Refresh the user list to reflect the deletion
-              fetchUsers();
-            } catch (e) {
-              setNotifications((prev: any) => [
-                ...prev,
-                {
-                  id: Date.now(),
-                  message: 'A user has been deleted.',
-                  timestamp: new Date().toLocaleString(),
-                },
-              ]);
-              // Refresh the user list even if parsing fails
-              fetchUsers();
-            }
-          }
-        });
-        // stompClient.subscribe('/topic/userLocked', (message) => {
-        //   // The backend sends a UserAuditLog object
-        //   if (message.body) {
-        //     try {
-        //       const auditLog = JSON.parse(message.body);
-        //       const userName = auditLog.fullName || auditLog.details || 'A user';
-        //       setNotifications((prev: any) => [
-        //         ...prev,
-        //         {
-        //           id: Date.now(),
-        //           message: `User "${userName}" has been locked!`,
-        //           timestamp: new Date().toLocaleString(),
-        //         },
-        //       ]);
-        //     } catch (e) {
-        //       setNotifications((prev: any) => [
-        //         ...prev,
-        //         {
-        //           id: Date.now(),
-        //           message: 'A user has been locked.',
-        //           timestamp: new Date().toLocaleString(),
-        //         },
-        //       ]);
-        //     }
-        //   }
-        // });
-        // stompClient.subscribe('/topic/userUnlocked', (message) => {
-        //   // The backend sends a UserAuditLog object
-        //   if (message.body) {
-        //     try {
-        //       const auditLog = JSON.parse(message.body);
-        //       const userName = auditLog.fullName || auditLog.details || 'A user';
-        //       setNotifications((prev: any) => [
-        //         ...prev,
-        //         {
-        //           id: Date.now(),
-        //           message: `User "${userName}" has been unlocked!`,
-        //           timestamp: new Date().toLocaleString(),
-        //         },
-        //       ]);
-        //     } catch (e) {
-        //       setNotifications((prev: any) => [
-        //         ...prev,
-        //         {
-        //           id: Date.now(),
-        //           message: 'A user has been unlocked.',
-        //           timestamp: new Date().toLocaleString(),
-        //         },
-        //       ]);
-        //     }
-        //   }
-        // });
-      },
-    });
-    stompClient.activate();
-    return () => {
-      stompClient.deactivate();
-    };
-  }, [setNotifications]);
 
   const handleSearchChange = (text: string) => {
     setSearchText(text);
