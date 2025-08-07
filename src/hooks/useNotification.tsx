@@ -14,6 +14,9 @@ export function useNotification() {
     // Pagination
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    
+    // Display management - how many notifications to show in the dropdown
+    const [displayLimit, setDisplayLimit] = useState(5);
 
     const [loading, setLoading] = useState(false);
 
@@ -75,6 +78,9 @@ export function useNotification() {
         // Update the combined notifications display
         setNotifications(prev => [newNotification, ...prev]);
         
+        // Reset display limit when new notification comes in to ensure it's visible
+        setDisplayLimit(prev => Math.max(prev, 5));
+        
         // Recalculate unread count after localStorage is updated
         setTimeout(() => {
             calculateUnreadCount();
@@ -99,46 +105,67 @@ export function useNotification() {
         try {
             setLoading(true);
 
-            const res = await fetch(`http://localhost:8081/patient/notifications/paging?page=${pageNumber}&size=4`, {
-                credentials: "include"
-            });
+            // Fetch from both services in parallel
+            const [iamResponse, patientResponse] = await Promise.allSettled([
+                fetch(`http://localhost:8080/iam/notifications/paging?page=${pageNumber}&size=5`, {
+                    credentials: "include"
+                }),
+                fetch(`http://localhost:8081/patient/notifications/paging?page=${pageNumber}&size=5`, {
+                    credentials: "include"
+                })
+            ]);
 
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            let allNewNotifications: any[] = [];
+            let hasMoreIam = false;
+            let hasMorePatient = false;
+
+            // Process IAM service response
+            if (iamResponse.status === 'fulfilled' && iamResponse.value.ok) {
+                const iamData = await iamResponse.value.json();
+                allNewNotifications.push(...(iamData.content || []));
+                hasMoreIam = !iamData.last; // Spring Boot Page object has 'last' property
+            } else {
+                console.warn("IAM notification service unavailable");
             }
 
-            const data = await res.json();
+            // Process Patient service response
+            if (patientResponse.status === 'fulfilled' && patientResponse.value.ok) {
+                const patientData = await patientResponse.value.json();
+                allNewNotifications.push(...(patientData.content || []));
+                hasMorePatient = !patientData.last; // Spring Boot Page object has 'last' property
+            } else {
+                console.warn("Patient notification service unavailable");
+            }
 
-            if (data.content.length === 0 || data.last) {
-                setHasMore(false);
+            // Sort combined notifications by creation date (newest first)
+            allNewNotifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+            // Check if there are more notifications from either service
+            const stillHasMore = hasMoreIam || hasMorePatient;
+            console.log(`Pagination debug - Page: ${pageNumber}, IAM hasMore: ${hasMoreIam}, Patient hasMore: ${hasMorePatient}, Total hasMore: ${stillHasMore}`);
+            console.log(`Fetched ${allNewNotifications.length} new notifications`);
+            setHasMore(stillHasMore);
+
+            if (allNewNotifications.length === 0 && !stillHasMore) {
                 return;
             }
 
-            const newPatientNotifications = data.content;
-            
-            // Update patient notifications without affecting in-memory IAM notifications
+            // Update notifications
             setNotifications((prev) => {
-                // Get only patient notifications (filter out IAM notifications)
-                const existingPatientNotifications = prev.filter(n => 
-                    n.entityType === "PATIENT" || n.entityType === "PATIENT_ORDER"
-                );
-                
-                const combined = [...existingPatientNotifications, ...newPatientNotifications];
-                // Remove duplicates by id
+                const combined = [...prev, ...allNewNotifications];
+                // Remove duplicates by id and sort by creation date
                 const unique = combined.filter(
                     (item, index, self) =>
                         index === self.findIndex((t) => t.id === item.id)
-                );
+                ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
                 
-                // Merge with in-memory IAM notifications, putting IAM notifications first (newest)
-                return [...inMemoryNotifications, ...unique];
+                console.log(`Total notifications after update: ${unique.length}`);
+                return unique;
             });
         } catch (err: any) {
-            console.warn("Patient service unavailable, showing only IAM notifications:", err);
-            // If patient service is down, just show IAM notifications
+            console.warn("Error fetching notifications:", err);
+            // If both services are down, keep showing in-memory IAM notifications
             setNotifications(prev => {
-                // Filter out any patient notifications and keep only IAM
-                const iamOnly = prev.filter(n => n.entityType === "USER");
                 return [...inMemoryNotifications];
             });
             setHasMore(false);
@@ -148,41 +175,72 @@ export function useNotification() {
     };
 
     const loadNextPage = () => {
-        if (hasMore) {
-            setPage((prev) => prev + 1);
-            fetchPageNotifications(page);
+        if (displayLimit < notifications.length) {
+            // If we have more notifications in memory, just show more of them
+            setDisplayLimit(prev => prev + 5);
+        } else if (hasMore && !loading) {
+            // If we need to fetch more from backend
+            const nextPage = page + 1;
+            setPage(nextPage);
+            fetchPageNotifications(nextPage);
         }
     }
+
+    // Helper function to get notifications to display (limited by displayLimit)
+    const getDisplayedNotifications = () => {
+        return notifications.slice(0, displayLimit);
+    };
+
+    // Helper function to check if we should show "See more" button
+    const shouldShowMoreButton = () => {
+        return displayLimit < notifications.length || hasMore;
+    };
 
     // Helper function to calculate total unread count
     const calculateUnreadCount = async () => {
         try {
-            // Get patient unread count from API
-            let patientUnreadCount = 0;
-            try {
-                const res = await fetch("http://localhost:8081/patient/notifications/unread-count", {
+            // Get unread count from both services in parallel
+            const [iamResponse, patientResponse] = await Promise.allSettled([
+                fetch("http://localhost:8080/iam/notifications/unread-count", {
                     credentials: "include",
-                });
-                patientUnreadCount = await res.json();
-            } catch (patientServiceError) {
-                console.warn("Patient service unavailable, only counting IAM notifications:", patientServiceError);
+                }),
+                fetch("http://localhost:8081/patient/notifications/unread-count", {
+                    credentials: "include",
+                })
+            ]);
+
+            let totalUnreadCount = 0;
+
+            // Process IAM service response
+            if (iamResponse.status === 'fulfilled' && iamResponse.value.ok) {
+                const iamCount = await iamResponse.value.json();
+                totalUnreadCount += iamCount;
+            } else {
+                console.warn("IAM notification service unavailable for unread count");
             }
-            
-            // Get IAM unread count from localStorage
-            let iamUnreadCount = 0;
-            try {
-                const savedIamNotifications = localStorage.getItem('iam-notifications');
-                if (savedIamNotifications) {
+
+            // Process Patient service response
+            if (patientResponse.status === 'fulfilled' && patientResponse.value.ok) {
+                const patientCount = await patientResponse.value.json();
+                totalUnreadCount += patientCount;
+            } else {
+                console.warn("Patient notification service unavailable for unread count");
+            }
+
+            // Add in-memory IAM notifications unread count (for backward compatibility)
+            const savedIamNotifications = localStorage.getItem('iam-notifications');
+            if (savedIamNotifications) {
+                try {
                     const parsed: NotificationEvent[] = JSON.parse(savedIamNotifications);
-                    iamUnreadCount = parsed.filter(n => !n.isRead).length;
+                    const inMemoryUnread = parsed.filter(n => !n.isRead).length;
+                    totalUnreadCount += inMemoryUnread;
+                } catch (e) {
+                    console.error('Error counting in-memory IAM notifications:', e);
                 }
-            } catch (e) {
-                console.error('Error reading IAM notifications for unread count:', e);
             }
             
-            const totalUnread = patientUnreadCount + iamUnreadCount;
-            setUnreadCount(totalUnread);
-            return totalUnread;
+            setUnreadCount(totalUnreadCount);
+            return totalUnreadCount;
         } catch (err: any) {
             console.log("Error in calculating unread count");
             throw err;
@@ -195,11 +253,11 @@ export function useNotification() {
 
     const markAsRead = async (id: string) => {
         try {
-            // Check if it's an IAM notification (in-memory)
-            const isIamNotification = inMemoryNotifications.some(n => n.id === id);
+            // Check if it's an in-memory IAM notification (for backward compatibility)
+            const isInMemoryIamNotification = inMemoryNotifications.some(n => n.id === id);
             
-            if (isIamNotification) {
-                // Mark IAM notification as read in memory
+            if (isInMemoryIamNotification) {
+                // Mark in-memory IAM notification as read
                 setInMemoryNotifications(prev => {
                     const updated = prev.map(n => n.id === id ? { ...n, isRead: true } : n);
                     // Also update localStorage immediately
@@ -225,16 +283,31 @@ export function useNotification() {
                     calculateUnreadCount();
                 }, 50);
             } else {
-                // Handle patient notifications via API
-                try {
-                    await fetch(`http://localhost:8081/patient/notifications/${id}/read`, {
+                // Try to mark as read in both services (we don't know which service owns this notification)
+                const [iamResponse, patientResponse] = await Promise.allSettled([
+                    fetch(`http://localhost:8080/iam/notifications/${id}/read`, {
                         method: "PUT",
                         credentials: "include",
-                    });
-                    fetchPageNotifications(page);
+                    }),
+                    fetch(`http://localhost:8081/patient/notifications/${id}/read`, {
+                        method: "PUT",
+                        credentials: "include",
+                    })
+                ]);
+
+                // Check if at least one service successfully marked it as read
+                const iamSuccess = iamResponse.status === 'fulfilled' && iamResponse.value.ok;
+                const patientSuccess = patientResponse.status === 'fulfilled' && patientResponse.value.ok;
+
+                if (iamSuccess || patientSuccess) {
+                    // Update the notification display
+                    setNotifications(prev => 
+                        prev.map(n => n.id === id ? { ...n, isRead: true } : n)
+                    );
+                    
                     calculateUnreadCount();
-                } catch (patientServiceError) {
-                    console.warn("Patient service unavailable, could not mark patient notification as read:", patientServiceError);
+                } else {
+                    console.warn("Could not mark notification as read in any service");
                     // Still try to update the display optimistically
                     setNotifications(prev => 
                         prev.map(n => n.id === id ? { ...n, isRead: true } : n)
@@ -249,17 +322,27 @@ export function useNotification() {
 
     const markAllAsRead = async () => {
         try {
-            // Try to mark all patient notifications as read via API
-            try {
-                await fetch(`http://localhost:8081/patient/notifications/mark-all-read`, {
+            // Try to mark all notifications as read in both services
+            const [iamResponse, patientResponse] = await Promise.allSettled([
+                fetch(`http://localhost:8080/iam/notifications/mark-all-read`, {
                     method: "PUT",
                     credentials: "include",
-                });
-            } catch (patientServiceError) {
-                console.warn("Patient service unavailable, only marking IAM notifications as read:", patientServiceError);
+                }),
+                fetch(`http://localhost:8081/patient/notifications/mark-all-read`, {
+                    method: "PUT",
+                    credentials: "include",
+                })
+            ]);
+
+            // Log any service failures
+            if (iamResponse.status === 'rejected' || !iamResponse.value.ok) {
+                console.warn("IAM notification service unavailable for mark all as read");
+            }
+            if (patientResponse.status === 'rejected' || !patientResponse.value.ok) {
+                console.warn("Patient notification service unavailable for mark all as read");
             }
             
-            // Mark all IAM notifications as read in memory
+            // Mark all in-memory IAM notifications as read (for backward compatibility)
             setInMemoryNotifications(prev => {
                 const updated = prev.map(n => ({ ...n, isRead: true }));
                 // Also update localStorage immediately
@@ -280,11 +363,11 @@ export function useNotification() {
                 prev.map(n => ({ ...n, isRead: true }))
             );
             
-            // Try to fetch page notifications, but don't fail if patient service is down
+            // Try to fetch updated notifications
             try {
                 fetchPageNotifications(page);
             } catch (fetchError) {
-                console.warn("Could not fetch patient notifications:", fetchError);
+                console.warn("Could not fetch updated notifications:", fetchError);
             }
             
             // Recalculate unread count after localStorage is updated
@@ -298,8 +381,12 @@ export function useNotification() {
     };
 
     useEffect(() => {
-        fetchPageNotifications(0);
-        fetchUnreadCount();
+        const initializeNotifications = async () => {
+            await fetchPageNotifications(0);
+            await fetchUnreadCount();
+        };
+        
+        initializeNotifications();
 
         // Patient service WebSocket connection
         const patientSocket = new SockJS("http://localhost:8081/patient/ws");
@@ -473,20 +560,35 @@ export function useNotification() {
                 );
                 
                 // Merge IAM notifications with patient notifications, IAM first (newest)
-                return [...inMemoryNotifications, ...patientNotifications];
+                const merged = [...inMemoryNotifications, ...patientNotifications];
+                
+                // Check if we should show "See more" button
+                // If we have more than 5 total notifications, there might be more to load
+                if (merged.length > 5 && !hasMore) {
+                    setHasMore(true);
+                }
+                
+                return merged;
             });
         }
     }, [inMemoryNotifications]);
 
     return {
-        notifications,
+        notifications: getDisplayedNotifications(),
+        allNotifications: notifications, // Keep reference to all notifications
         unreadCount,
         markAsRead,
         markAllAsRead,
         loadNextPage,
-        hasMore,
+        hasMore: shouldShowMoreButton(),
         loading,
         open,
-        setOpen
+        setOpen: (isOpen: boolean) => {
+            setOpen(isOpen);
+            // Reset display limit when opening dropdown
+            if (isOpen) {
+                setDisplayLimit(5);
+            }
+        }
     };
 }
