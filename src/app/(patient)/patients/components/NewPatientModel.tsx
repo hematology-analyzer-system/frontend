@@ -49,9 +49,9 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
       // }
 
       if (!response.ok) {
-        // const errMsg ='Failed to create patient';
-        // alert(errMsg);
-        window.location.reload();
+        const errMsg ='Failed to create patient';
+        alert(errMsg);
+        // window.location.reload();
         return;
       }
 
