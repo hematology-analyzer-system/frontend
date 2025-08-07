@@ -45,12 +45,13 @@ export default function LoginPage() {
 
         const roleData = await response2.json();
         if (response2.ok) {
+          localStorage.setItem('userId', JSON.stringify(roleData.userId));
           localStorage.setItem('fullName', JSON.stringify(roleData.fullName));
           localStorage.setItem('email', JSON.stringify(roleData.email));
           localStorage.setItem('privilege_ids', JSON.stringify(roleData.privilege_ids));
         }
 
-        router.push('/iam/users');
+        router.push('/iam/users/profile');
       } else {
         setError(data.message || 'Invalid Username or Password!');
       }
