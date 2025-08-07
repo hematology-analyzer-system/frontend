@@ -11,6 +11,7 @@ import EditResultCommentModel from '../../components/EditResultCommentModel'
 import { generateSimpleTestOrderPDF } from '../../utils/simplePdfGenerator';
 export default function TestOrderResultsPage() {
   const { id } = useParams();               // lấy test-order ID từ URL
+  const router = useRouter();
   const [order, setOrder]       = useState<TestOrderRaw | null>(null);
   const [loading, setLoading]   = useState(true);
   const [selected, setSelected] = useState<number>(0);
@@ -67,7 +68,9 @@ export default function TestOrderResultsPage() {
           ? { ...r, comments: [...r.comment_result, c] }
           : r
       );
+      window.location.reload();
       return { ...prev, results: newResults };
+      
     });
   };
    const handleModifyComment = (commentId: number) => {
@@ -201,9 +204,6 @@ export default function TestOrderResultsPage() {
     const fresh = await fetchTestOrderById(Number(id));
     setOrder(fresh);
     setEditMode(false);
-  };
-  const handlePrint = () => {
-    window.print();
   };
 
   const handleDownloadCurrentResult = () => {

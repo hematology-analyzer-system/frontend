@@ -85,13 +85,14 @@ export default function TestOrderDetailPage() {
       if (!res.ok) throw new Error('Error creating comment');
       const newComment = await res.json();
       // thêm vào state để hiển thị ngay
-      setOrder({
-        ...order,
-        comments: [...order.comments, newComment],
-      });
+      // setOrder({
+      //   ...order,
+      //   comments: [...order.comments, newComment],
+      // });
       // đóng modal
       setAdding(false);
       setText('');
+      window.location.reload();
     } catch (e) {
       console.error(e);
       alert('Failed to save comment');
@@ -121,6 +122,7 @@ export default function TestOrderDetailPage() {
 
     // sau khi server trả về comment mới (hoặc OK)
     // cập nhật lại mảng comments trong state
+    router.refresh();
     setOrder(prev => {
       if (!prev) return prev;
       return {
@@ -147,7 +149,7 @@ export default function TestOrderDetailPage() {
         credentials: 'include'
        }
     );
-    router.push('/testorders');
+    router.refresh();
   }
   const handleGenerate = async () => {
     try {
@@ -164,11 +166,9 @@ export default function TestOrderDetailPage() {
         const text = await res.text();
         throw new Error(`Gen failed: ${res.status} ${text}`);
       }
-
+      alert("gen result successfully");
       // 1) Chuyển qua trang xem kết quả
-      router.push(`/testorders/${order.testId}`);
-      // — hoặc nếu bạn chỉ muốn ở lại page detail mà reload data:
-      // router.refresh();
+      window.location.reload();
 
     } catch (err) {
       console.error(err);

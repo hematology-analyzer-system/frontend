@@ -29,7 +29,7 @@ const handleCreate = async (id: Number) => {
       }
     );
     if (!res.ok) {
-      alert('Failed to create testorder for existing patient');
+      alert('Failed to create testorder for patient');
       return;
     }
     alert('Create testorder successfully');
