@@ -16,25 +16,11 @@ export function useNotification() {
 
     const [loading, setLoading] = useState(false);
 
-
-    // const fetchNotifications = async () => {
-    //     try {
-    //         const res = await fetch("http://localhost:8081/patient/notifications", {
-    //             credentials: "include",
-    //         });
-    //         const data = await res.json();
-    //         setNotifications(data);
-    //     } catch (err: any) {
-    //         console.log("Error in fetching notification list");
-    //         throw err;
-    //     }
-    // };
-
     const fetchPageNotifications = async (pageNumber: number) => {
         try {
             setLoading(true);
 
-            const res = await fetch(`http://localhost:8081/patient/notifications/paging?page=${pageNumber}&size=4`, {
+            const res = await fetch(`https://fhard.khoa.email/api/patients/notifications/paging?page=${pageNumber}&size=4`, {
                 credentials: "include"
             });
             const data = await res.json();
@@ -70,7 +56,7 @@ export function useNotification() {
 
     const fetchUnreadCount = async () => {
         try {
-            const res = await fetch("http://localhost:8081/patient/notifications/unread-count", {
+            const res = await fetch("https://fhard.khoa.email/api/patients/notifications/unread-count", {
                 credentials: "include",
             });
             const data = await res.json();
@@ -83,7 +69,7 @@ export function useNotification() {
 
     const markAsRead = async (id: string) => {
         try {
-            await fetch(`http://localhost:8081/patient/notifications/${id}/read`, {
+            await fetch(`https://fhard.khoa.email/api/patients/notifications/${id}/read`, {
                 method: "PUT",
                 credentials: "include",
             });
@@ -97,7 +83,7 @@ export function useNotification() {
 
     const markAllAsRead = async () => {
         try {
-            await fetch(`http://localhost:8081/patient/notifications/mark-all-read`, {
+            await fetch(`https://fhard.khoa.email/api/patients/notifications/mark-all-read`, {
                 method: "PUT",
                 credentials: "include",
             });
@@ -113,7 +99,7 @@ export function useNotification() {
         fetchPageNotifications(0);
         fetchUnreadCount();
 
-        const socket = new SockJS("http://localhost:8081/patient/ws");
+        const socket = new SockJS("https://fhard.khoa.email/api/patients/ws");
         const client = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {

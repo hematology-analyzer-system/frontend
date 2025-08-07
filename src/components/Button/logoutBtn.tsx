@@ -8,7 +8,7 @@ const LogoutButton = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await fetch("http://localhost:8080/iam/auth/logout", {
+    await fetch("https://fhard.khoa.email/api/iam/auth/logout", {
       method: "POST",
       credentials: "include",
     });

@@ -20,7 +20,7 @@ export interface PageFilter<T> {
   number: number, 
 }
 
-export const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/patient';
+export const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://fhard.khoa.email/api';
 
 export async function fetchPatientId(id: Number): Promise<Patient> {
   const res = await fetch(`${BASE}/patients/${id}`, {

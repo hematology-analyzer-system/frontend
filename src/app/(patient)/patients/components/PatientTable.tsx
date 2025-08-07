@@ -21,7 +21,7 @@ function extractIdNum(runBy: string | null): string | null {
 }
 const handleCreate = async (id: Number) => {
     const res = await fetch(
-      `http://localhost:8082/testorder/testorder/create/${id}`,
+      `https://fhard.khoa.email/api/testorders/testorder/create/${id}`,
       {
         method: 'POST',
         credentials: 'include',

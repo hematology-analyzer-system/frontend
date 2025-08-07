@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const apiIAM = axios.create({
-  baseURL: "http://localhost:8080/iam",
+  baseURL: "https://fhard.khoa.email/api/iam",
   withCredentials: true, // Include cookies (JWT)
 });
 

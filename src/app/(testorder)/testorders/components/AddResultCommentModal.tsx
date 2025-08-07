@@ -18,7 +18,7 @@ export interface Comment {
 
 const BASE = process.env.NEXT_PUBLIC_API_URL
   ? `${process.env.NEXT_PUBLIC_API_URL}/testorder`
-  : 'http://localhost:8082/testorder';
+  : 'https://fhard.khoa.email/api/testorders';
 
 const AddResultCommentModal: FC<Props> = ({ resultId, onClose, onSaved }) => {
   const [text, setText] = useState('');

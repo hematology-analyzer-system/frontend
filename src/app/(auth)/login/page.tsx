@@ -26,7 +26,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/iam/auth/login', {
+      const response = await fetch('https://fhard.khoa.email/api/iam/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -36,7 +36,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok && data.token) {
-        const response2 = await fetch('http://localhost:8080/iam/auth/me', {
+        const response2 = await fetch('https://fhard.khoa.email/api/iam/auth/me', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',

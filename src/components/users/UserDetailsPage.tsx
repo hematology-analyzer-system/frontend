@@ -60,7 +60,7 @@ const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCance
       setRolesLoading(true);
       setRolesError(null);
       try {
-        const res = await fetch('http://localhost:8080/iam/roles', {
+        const res = await fetch('https://fhard.khoa.email/api/iam/roles', {
           method: 'GET',
           credentials: 'include',
         });
@@ -375,7 +375,7 @@ const UserDetailsPage: React.FC<UserDetailsPageProps> = ({ user, onSave, onCance
                   formDataObj.append("file", file);
 
                   try {
-                    const res = await fetch("http://localhost:8080/iam/users/upload", {
+                    const res = await fetch("https://fhard.khoa.email/api/iam/users/upload", {
                       method: "POST",
                       body: formDataObj,
                       credentials: "include",

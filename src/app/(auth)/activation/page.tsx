@@ -13,7 +13,7 @@ const VerifyPage = () => {
     const flow = params.get('flow');
 
     if (flow === 'activation' && email) {
-      fetch(`http://localhost:8080/iam/auth/activation/${encodeURIComponent(email)}`)
+      fetch(`https://fhard.khoa.email/api/iam/auth/login/activation/${encodeURIComponent(email)}`)
         .then(res => res.json())
         .then(data => {
           setMessage(data.message || 'Activation complete!');

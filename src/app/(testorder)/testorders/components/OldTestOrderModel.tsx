@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL
   ? process.env.NEXT_PUBLIC_API_URL + '/testorder'
-  : 'http://localhost:8082/testorder';
+  : 'https://fhard.khoa.email/api/testorders';
 
 interface Props {
   onClose(): void;

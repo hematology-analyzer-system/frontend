@@ -18,7 +18,7 @@ export default function NewTestOrderModel({ onClose, onCreated }: Props) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fhard.khoa.email/api/testorders';
      const [year, month, day] = dateOfBirth.split('-');
     const formattedDate = `${month}/${day}/${year}`;
     try {

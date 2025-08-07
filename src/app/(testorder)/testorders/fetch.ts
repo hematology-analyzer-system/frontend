@@ -103,7 +103,7 @@ export interface TestOrder {
   
 }
 
-export const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder';
+export const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://fhard.khoa.email/api/testorders';
 
 export async function fetchTestOrders(
 ): Promise<PageResponse<TestOrderRaw>> {

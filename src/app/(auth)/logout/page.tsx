@@ -9,7 +9,7 @@ const LogoutPage = () => {
   const handleLogout = async () => {
     // 1. Call the logout API endpoint
     // await apiIAM.post('auth/logout')
-    await fetch("http://localhost:8080/iam/auth/logout", {
+    await fetch("https://fhard.khoa.email/api/iam/auth/logout", {
       method: "POST",
       credentials: "include", 
     });

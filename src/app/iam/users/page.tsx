@@ -71,7 +71,7 @@ export default function UsersPage() {
     });
 
     try {
-      const url = `http://localhost:8080/iam/users/filter?${params.toString()}`;
+      const url = `https://fhard.khoa.email/api/iam/users/filter?${params.toString()}`;
       console.log("fetching: ", url);
       const options: RequestInit = {
         method: 'GET',
@@ -115,7 +115,7 @@ export default function UsersPage() {
     setRolesLoading(true);
     setRolesError(null);
     try {
-      const res = await fetch('http://localhost:8080/iam/roles', {
+      const res = await fetch('https://fhard.khoa.email/api/iam/roles', {
         method: 'GET',
         credentials: 'include',
       });
@@ -183,7 +183,7 @@ export default function UsersPage() {
 
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:8080/iam/users/${userId}`, {
+      const res = await fetch(`https://fhard.khoa.email/api/iam/users/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -213,14 +213,17 @@ export default function UsersPage() {
     setError(null);
 
     try {
-      const res = await fetch('http://localhost:8080/iam/users', {
+      const res = await fetch('https://fhard.khoa.email/api/iam/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          //  'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJwcml2aWxlZ2VfaWRzIjpbMSwyLDMsNCw1LDYsNyw4LDksMTAsMTEsMTIsMTMsMTQsMTUsMTYsMTcsMTgsMTksMjAsMjFdLCJmdWxsTmFtZSI6IkFkbWluaXN0cmF0b3IiLCJpZGVudGlmeU51bSI6IjAwMDEiLCJ1c2VyaWQiOjEsImVtYWlsIjoiYWRtaW5Ac3lzLmNvbSIsInN1YiI6ImFkbWluQHN5cy5jb20iLCJpYXQiOjE3NTQ1NjIxNDcsImV4cCI6MTc1NDY0ODU0N30.jELlO0ZJfq5p0CrY0Vs_3Qunxz1SLM78Uw9d2avdt9k',
         },
         credentials: 'include',
         body: JSON.stringify(userData),
       });
+
+      console.log(res);
 
       const responseData = await res.json();
       console.log("Response status:", res.status);

@@ -96,7 +96,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const res = await fetch('http://localhost:8080/iam/auth/register', {
+      const res = await fetch('https://fhard.khoa.email/api/iam/auth/register', {
         method : 'POST',
         headers : {
           'Content-Type': 'application/json',

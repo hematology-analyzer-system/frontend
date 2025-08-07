@@ -53,7 +53,7 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/patient/patients/${patient.id}`, {
+      const res = await fetch(`https://fhard.khoa.email/api/patients/patients/${patient.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -90,7 +90,7 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
   if (!confirmed) return;
 
   try {
-    const res = await fetch(`http://localhost:8081/patient/patients/${patient.id}`, {
+    const res = await fetch(`https://fhard.khoa.email/api/patients/patients/${patient.id}`, {
       method: "DELETE",
     });
 

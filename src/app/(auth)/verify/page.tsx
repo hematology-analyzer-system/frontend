@@ -91,7 +91,7 @@ export default function VerifyOtpPage() {
         redirectPath = '/login';
       }
 
-        const res = await fetch(`http://localhost:8080/iam${endpoint}`, {
+        const res = await fetch(`https://fhard.khoa.email/api/iam${endpoint}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ export default function VerifyOtpPage() {
 
       console.log(endpoint);
 
-      const res = await fetch(`http://localhost:8080/iam${endpoint}`, {
+      const res = await fetch(`https://fhard.khoa.email/api/iam${endpoint}`, {
         method: 'POST',
         headers : {
           'Content-Type' : 'application/json',

@@ -27,7 +27,7 @@ export default function SingleUserDetailsPage({ params }: UserDetailsProps) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`http://localhost:8080/iam/users/${id}`, {
+      const res = await fetch(`https://fhard.khoa.email/api/iam/users/${id}`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -73,7 +73,7 @@ export default function SingleUserDetailsPage({ params }: UserDetailsProps) {
 
       console.log("Sending payload to backend:", updatePayload);
 
-      const res = await fetch(`http://localhost:8080/iam/users/${params.id}`, {
+      const res = await fetch(`https://fhard.khoa.email/api/iam/users/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -116,7 +116,7 @@ export default function SingleUserDetailsPage({ params }: UserDetailsProps) {
     try {
       // Corrected payload key and URL logic
       const status = isLock ? 'unlock' : 'lock';
-      const res = await fetch(`http://localhost:8080/iam/users/${params.id}/${status}`, {
+      const res = await fetch(`https://fhard.khoa.email/api/iam/users/${params.id}/${status}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

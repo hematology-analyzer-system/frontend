@@ -64,7 +64,7 @@ export default function TestOrderDetailPage() {
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this testorder?')) return;
     await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder'}/testorder/${order.testId}`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://fhard.khoa.email/api/testorders'}/testorder/${order.testId}`,
       { method: 'DELETE',
         credentials: 'include'
        }
@@ -75,7 +75,7 @@ export default function TestOrderDetailPage() {
     if (!commentText.trim()) return;    // không gửi nếu rỗng
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder'}/comment/addTO/${order.testId}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://fhard.khoa.email/api/testorders'}/comment/addTO/${order.testId}`,
         { method: 'POST',
           headers: { 'Content-Type':'application/json' },
           credentials: 'include',
@@ -144,7 +144,7 @@ export default function TestOrderDetailPage() {
   const handleDeleteComment = async (id: number) => {
     if (!confirm('Are you sure you want to delete this comment?')) return;
     await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder'}/comment/testorder/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://fhard.khoa.email/api/testorders'}/comment/testorder/${id}`,
       { method: 'DELETE',
         credentials: 'include'
        }

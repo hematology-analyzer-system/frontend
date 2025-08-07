@@ -20,7 +20,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/patient';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fhard.khoa.email/api';
     //  const [year, month, day] = dateOfBirth.split('-');
     // const formattedDate = `${year}-${day}-${month}`;
     try {

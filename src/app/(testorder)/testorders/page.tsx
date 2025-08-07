@@ -21,7 +21,7 @@ export default function TestOrderPage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/testorder';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fhard.khoa.email/api/testorders';
 
   // Trigger search when any filter changes
   useEffect(() => {
