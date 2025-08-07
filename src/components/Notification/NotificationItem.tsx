@@ -1,12 +1,15 @@
 import { useNotification } from "@/hooks/useNotification";
 import { NotificationEvent } from "@/type/NotificationEvent";
+import { useRouter } from "next/navigation";
 
 interface Props {
     notificationItem: NotificationEvent;
 }
 
 export default function NotificationItem({ notificationItem }: Props) {
-    const { markAsRead } = useNotification();
+    let{ markAsRead, setOpen } = useNotification();
+
+    const router = useRouter();
 
     const calculateMinite = (createdAt: Date) => {
         const created = new Date(createdAt);
@@ -30,13 +33,19 @@ export default function NotificationItem({ notificationItem }: Props) {
             month: '2-digit',
             day: '2-digit'
         });
-    }
+    };
+
+    const handleOnClick = () => {
+        setOpen(false);
+        markAsRead(notificationItem.id);
+        router.replace(`/patients/${notificationItem.entityId}`);
+    };
 
     return (
         <li
             className={`relative px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer 
             ${notificationItem.isRead ? "bg-white" : "bg-gray-100 font-semibold"}`}
-            onClick={() => markAsRead(notificationItem.id)}>
+            onClick={handleOnClick}>
 
             {!notificationItem.isRead && <div className="w-[10px] h-[10px] rounded-full bg-primary absolute right-3"></div>}
 

@@ -6,8 +6,7 @@ import NotificationOutlineIcon from "@/assets/icons/NotificationOutlineIcon";
 
 
 export default function NotificationBell() {
-    const { unreadCount } = useNotification();
-    const [open, setOpen] = useState(false);
+    const { unreadCount, open, setOpen } = useNotification();
 
     return (
         <div className="relative">

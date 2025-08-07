@@ -17,7 +17,7 @@ const Header: FC<Props> = ({ onNew }) => {
       {hasCreatePrivilege && (<div className="flex items-center space-x-3">
         <button
           onClick={onNew}
-          className="flex items-center bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700"
+          className="button flex items-center text-white px-4 py-2 rounded-lg"
         >
           <Plus className="mr-2" />Testorder for new patient
         </button>
