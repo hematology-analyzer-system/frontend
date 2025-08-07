@@ -425,14 +425,14 @@ const RoleForm: React.FC<RoleFormProps> = ({ role, allPrivileges, onSave, onClos
               <div className="flex gap-4 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-2 px-4 rounded-full shadow-md hover:from-blue-500 hover:to-blue-600 transition"
+                  className="flex-1 bg-gradient-to-r button text-white font-semibold py-2 px-4 rounded-full shadow-md transition"
                 >
                   {role ? "Update Role" : "Create Role"}
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 border border-gray-400 text-gray-700 font-medium py-2 px-4 rounded-full hover:bg-gray-50 transition"
+                  className="flex-1 border outline-button font-medium py-2 px-4 rounded-full  transition"
                 >
                   Cancel
                 </button>
@@ -449,7 +449,7 @@ const RoleForm: React.FC<RoleFormProps> = ({ role, allPrivileges, onSave, onClos
           <div className="space-y-6">
             {Object.entries(groupedPrivileges).map(([group, list]) => (
               <div key={group} className="border border-gray-200 bg-white rounded-xl shadow p-4">
-                <h3 className="text-center text-sm font-semibold text-white bg-blue-600 rounded-full px-3 py-1 mb-3 uppercase tracking-wide">
+                <h3 className="text-center text-sm font-semibold text-white bg-primary rounded-full px-3 py-1 mb-3 uppercase tracking-wide">
                   {group}
                 </h3>
                 <div className="grid grid-cols-2 gap-2">

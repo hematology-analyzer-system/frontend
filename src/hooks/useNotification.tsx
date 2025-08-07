@@ -16,6 +16,8 @@ export function useNotification() {
 
     const [loading, setLoading] = useState(false);
 
+    const [open, setOpen] = useState(false);
+
 
     // const fetchNotifications = async () => {
     //     try {
@@ -143,5 +145,7 @@ export function useNotification() {
         loadNextPage,
         hasMore,
         loading,
+        open,
+        setOpen
     };
 }

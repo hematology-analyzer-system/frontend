@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import apiPatient from "@/lib/api/apiPatient";
 import FormField from "@/components/Form/FormField";
 
-type GenderType = "MALE" | "FEMALE" | "OTHER" ;
+type GenderType = "MALE" | "FEMALE" | "OTHER";
 
 
 interface PropsType {
@@ -37,7 +37,7 @@ const Page = ({ fullName, address, gender, dateOfBirth, phone, email }: PropsTyp
     });
   }, [fullName, address, gender, dateOfBirth, phone, email]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -49,7 +49,7 @@ const Page = ({ fullName, address, gender, dateOfBirth, phone, email }: PropsTyp
 
       const res = await apiPatient.post("/patients", formData, {
         headers: {
-          "Content-Type" : "application/json"
+          "Content-Type": "application/json"
         }
       });
       console.log("Success:", res.data);

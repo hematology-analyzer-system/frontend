@@ -9,8 +9,8 @@ function NotFound() {
             content="It looks like the page you're trying to reach either doesn't exist, was moved, or the link is broken. 
                     Let's help you get back on track"
             inputArray={['4', 'image', '4']}
-            backgroundText1="Server"
-            backgroundText2="error"
+            backgroundText1="not"
+            backgroundText2="found"
         >
             <></>
         </ErrorLayout>

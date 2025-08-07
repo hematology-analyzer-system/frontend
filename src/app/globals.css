@@ -254,7 +254,7 @@
   }
 
   .input {
-    @apply w-full bg-background dark:bg-surface-subtle-dark rounded-full px-5 focus:outline-none 
+    @apply w-full bg-background-light dark:bg-surface-subtle-dark rounded-full px-5 focus:outline-none 
     text-text-secondary dark:text-text-secondary-dark
     text-[12px] md:text-[15px] font-normal;
   }
