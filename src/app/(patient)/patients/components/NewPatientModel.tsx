@@ -2,6 +2,7 @@
 
 import { FC, useState } from 'react';
 import { X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   onClose: () => void;
@@ -15,6 +16,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,8 +49,9 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
       // }
 
       if (!response.ok) {
-        const errMsg ='Failed to create patient';
-        alert(errMsg);
+        // const errMsg ='Failed to create patient';
+        // alert(errMsg);
+        window.location.reload();
         return;
       }
 

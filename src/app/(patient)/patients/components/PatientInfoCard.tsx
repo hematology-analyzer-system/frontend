@@ -88,7 +88,8 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
       });
     } catch (err) {
       console.error(err);
-      alert("Failed to save.");
+      window.location.reload();
+      // alert("Failed to save.");
     }
   };
 

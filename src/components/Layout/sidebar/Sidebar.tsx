@@ -174,11 +174,11 @@ export const Sidebar = () => {
     const dynamicItems: NavItem[] = [];
 
     // Always show the Dashboard link
-    dynamicItems.push({
-      href: "/dashboard",
-      label: "Dashboard",
-      icon: <Squares2X2Icon className="h-5 w-5 text-gray-500" />
-    });
+    // dynamicItems.push({
+    //   href: "/dashboard",
+    //   label: "Dashboard",
+    //   icon: <Squares2X2Icon className="h-5 w-5 text-gray-500" />
+    // });
     
     // Conditionally add 'Patients' and 'Testorder' based on privilege_id 1
     // Note: The user's request links multiple items to a single ID.
