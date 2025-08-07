@@ -66,7 +66,7 @@ const PatientTable: FC<Props> = ({ data, reload }) => {
         {getTableHeaders().map(h => (
           <th
             key={h}
-            className="p-2 text-left text-sm font-medium text-gray-600"
+            className="p-2 text-center text-sm font-medium text-gray-600"
           >
             {h}
           </th>

@@ -33,62 +33,61 @@ const TestOrderTable: FC<Props> = ({ data, reload }) => {
 
       {/* Bảng Test Orders */}
       <div className="p-4 overflow-auto">
-        <table className="min-w-full bg-white rounded-lg shadow">
-          <thead className="bg-gray-100">
-            <tr>
-              {/* <th className="p-2"><input type="checkbox" /></th> */}
-              {['Patient name','Age','Gender','Phone','Status','Create by','Run date','Run by','View'].map(h => (
-                <th
-                  key={h}
-                  className="p-2 text-left text-sm font-medium text-gray-600"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          {data.length === 0 ? (
-  <tbody>
+       <table className="min-w-full bg-white rounded-lg shadow">
+  <thead className="bg-gray-100">
     <tr>
-      <td colSpan={9} className="p-8 text-center text-gray-500">
-        No data
-      </td>
-    </tr>
-  </tbody>
-) : (
-  <tbody>
-    {data.map(o => (
-      <tr key={o.id} className="border-t hover:bg-green-50">
-        <td className="p-2">{o.fullName}</td>
-        <td className="p-2">{o.age}</td>
-        <td className="p-2">{o.gender}</td>
-        <td className="p-2">{o.phone}</td>
-        <td
-          className={`p-2 ${
-            o.status.toLowerCase() === 'completed'
-              ? 'text-green-600'
-              : o.status.toLowerCase() === 'reviewed'
-                ? 'text-blue-600'
-                : 'text-orange-500'
-          }`}
+      {['Patient name', 'Age', 'Gender', 'Phone', 'Status', 'Create by', 'Run date', 'Run by', 'View'].map(h => (
+        <th
+          key={h}
+          className="p-3 text-center text-sm font-medium text-gray-600 border-b"
         >
-          {o.status.toLowerCase()}
-        </td>
-        <td className="p-2">{extractIdNum(o.createdBy) || '-'}</td>
-        <td className="p-2">{new Date(o.runAt).toLocaleDateString()}</td>
-        <td className="p-2">{extractIdNum(o.runBy) || '-'}</td>
-        <td className="p-2">
-          <Link href={`/testorders/${o.id}`}>
-            <button className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-              View
-            </button>
-          </Link>
+          {h}
+        </th>
+      ))}
+    </tr>
+  </thead>
+  <tbody>
+    {data.length === 0 ? (
+      <tr>
+        <td colSpan={9} className="p-8 text-center text-gray-500">
+          No data
         </td>
       </tr>
-    ))}
+    ) : (
+      data.map(o => (
+        <tr key={o.id} className="border-b hover:bg-green-50">
+          <td className="p-3 font-medium">{o.fullName}</td>
+          <td className="p-3">{o.age}</td>
+          <td className="p-3">{o.gender}</td>
+          <td className="p-3">{o.phone}</td>
+          <td className="p-3">
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                o.status.toLowerCase() === 'completed'
+                  ? 'bg-green-100 text-green-800'
+                  : o.status.toLowerCase() === 'reviewed'
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-orange-100 text-orange-800'
+              }`}
+            >
+              {o.status.toLowerCase()}
+            </span>
+          </td>
+          <td className="p-3">{extractIdNum(o.createdBy) || '-'}</td>
+          <td className="p-3">{new Date(o.runAt).toLocaleDateString()}</td>
+          <td className="p-3">{extractIdNum(o.runBy) || '-'}</td>
+          <td className="p-3">
+            <Link href={`/testorders/${o.id}`}>
+              <button className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors">
+                View
+              </button>
+            </Link>
+          </td>
+        </tr>
+      ))
+    )}
   </tbody>
-)}
-        </table>
+</table>
       </div>
 
       {/* Modal tạo new patient */}

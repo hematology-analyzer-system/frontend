@@ -43,6 +43,7 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
         email: patient.email
       });
 
+
     setEdited(isEdited);
   }, [formData, patient]);
 
@@ -56,6 +57,7 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
 
   const handleSave = async () => {
     try {
+      
       const res = await fetch(`http://localhost:8081/patient/patients/${patient.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -95,6 +97,28 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
   if (!confirmed) return;
 
   try {
+    const testOrderRes = await fetch(`http://localhost:8082/testorder/testorder/filter?searchText=${patient.email}`, {
+      method: "GET",
+      credentials: 'include'
+    });
+
+    if (!testOrderRes.ok) {
+      throw new Error("Failed to check test orders");
+    }
+
+    const testOrderData = await testOrderRes.json();
+    
+    // Check if any test orders exist (adjust this condition based on your API response structure)
+    const hasTestOrders = testOrderData && 
+                         ((Array.isArray(testOrderData) && testOrderData.length > 0) ||
+                          (testOrderData.content && testOrderData.content.length > 0) ||
+                          (testOrderData.totalElements && testOrderData.totalElements > 0));
+
+    if (hasTestOrders) {
+      alert("Cannot delete patient. This patient has existing test orders. Please remove all test orders first.");
+      return;
+    }
+
     const res = await fetch(`http://localhost:8081/patient/patients/${patient.id}`, {
       method: "DELETE",
       credentials: 'include'
@@ -108,6 +132,11 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
     alert("Failed to delete patient.");
   }
 };
+
+// const patientdata = fetch(`http://localhost:8082/testorder/testorder/filter?searchText=${patient.email}`, {
+//       method: "GET",
+//       credentials: 'include'
+//     });
 
 
 const renderField = (
