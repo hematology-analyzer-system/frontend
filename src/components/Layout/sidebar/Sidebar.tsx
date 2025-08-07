@@ -192,13 +192,13 @@ export const Sidebar = () => {
         
         // Build the nested 'Testorder' menu
         dynamicItems.push({
-          href: "#",
+          href: "/testorders",
           label: "Testorder",
           icon: <BeakerIcon className="h-5 w-5 text-gray-500" />,
-          children: [
-            { href: "/testorders", label: "Orders", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
-            { href: "/testorderResult", label: "Results", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
-          ],
+          // children: [
+          //   { href: "/testorders", label: "Orders", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
+          //   { href: "/testorderResult", label: "Results", icon: <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" /> },
+          // ],
         });
     }
 
