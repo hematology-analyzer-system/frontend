@@ -21,7 +21,7 @@ const Header: FC<Props> = ({ onNew }) => {
         </button>
         
       </div> */}
-      <div className="flex items-center space-x-3">
+      {/* <div className="flex items-center space-x-3">
         <button
           onClick={() => setDark(!dark)}
           className="p-2 rounded hover:bg-gray-200"
@@ -31,7 +31,7 @@ const Header: FC<Props> = ({ onNew }) => {
         <button className="p-2 rounded hover:bg-gray-200">
           <Sliders />
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
