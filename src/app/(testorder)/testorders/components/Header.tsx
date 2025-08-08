@@ -15,12 +15,12 @@ const Header: FC<Props> = ({ onNew }) => {
   return (
     <div className="flex justify-between items-center p-4">
       {hasCreatePrivilege && (<div className="flex items-center space-x-3">
-        <button
+        {/* <button
           onClick={onNew}
           className="button flex items-center text-white px-4 py-2 rounded-lg"
         >
           <Plus className="mr-2" />Testorder for new patient
-        </button>
+        </button> */}
         {/* <button
           onClick={onOld}
           className="flex items-center bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700"
