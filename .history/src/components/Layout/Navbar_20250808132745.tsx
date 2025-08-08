@@ -154,7 +154,11 @@ export const Navbar: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+      {/* <div className="flex items-center space-x-4">
+        <NotificationBell notifications={notifications} />
+        <UserCircleIcon className="h-6 w-6 text-black" />
+        <span className="text-sm font-medium">{fullName}</span>
+      </div> */}
     </div>
   );
 };

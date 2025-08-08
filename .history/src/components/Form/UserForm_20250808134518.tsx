@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from "react";
 import { CreateUserRequest, RoleResponseDTO } from "@/type/user";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Eye, EyeOff } from "lucide-react";
 import toast from 'react-hot-toast'; // Import toast
 
 interface UserFormProps {
@@ -39,7 +38,6 @@ const UserForm: React.FC<UserFormProps> = ({
   );
   const [errors, setErrors] = useState<{ [key: string]: string }>({}); // For client-side and backend field errors
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   // Removed submitError as field-specific errors will be handled by 'errors' state
   // and general errors by toast.
 
@@ -55,14 +53,6 @@ const UserForm: React.FC<UserFormProps> = ({
     if (password.length < 8) return "Password must be at least 8 characters long.";
     if (!/[A-Z]/.test(password)) return "Password must contain at least one capital letter.";
     if (!/\d/.test(password)) return "Password must contain at least one number.";
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return "Password must contain at least one special character.";
-    return "";
-  };
-
-  const validatePhone = (phone: string) => {
-    if (!phone) return "Phone number is required.";
-    const phoneDigits = phone.replace(/\D/g, ''); // Remove all non-digit characters
-    if (phoneDigits.length !== 10) return "Phone number must be exactly 10 digits.";
     return "";
   };
 
@@ -74,11 +64,7 @@ const UserForm: React.FC<UserFormProps> = ({
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Email address is invalid.";
     }
-    
-    // Enhanced phone validation
-    const phoneError = validatePhone(formData.phone || "");
-    if (phoneError) newErrors.phone = phoneError;
-    
+    if (!formData.phone) newErrors.phone = "Phone number is required.";
     if (!formData.identifyNum) newErrors.identifyNum = "Identification Number is required.";
     
     // Enhanced password validation
@@ -97,16 +83,7 @@ const UserForm: React.FC<UserFormProps> = ({
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
-    // Real-time password validation
-    if (name === 'password') {
-      const passwordError = validatePassword(value);
-      setErrors((prev) => ({ ...prev, password: passwordError }));
-    } else if (name === 'phone') {
-      // Real-time phone validation
-      const phoneError = validatePhone(value);
-      setErrors((prev) => ({ ...prev, phone: phoneError }));
-    } else if (errors[name]) {
+    if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" })); // Clear error when user types
     }
   };
@@ -205,29 +182,17 @@ const UserForm: React.FC<UserFormProps> = ({
 
             {/* Password is required for creation, might be optional/different for edit */}
             {!user && ( // Only show password field for creation
-              <div className="relative">
+              <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password<span className="text-red-500">*</span></label>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type="password"
                   id="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`block w-full px-4 py-2 pr-10 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
                   placeholder="Enter password"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(prev => !prev)}
-                  className="absolute inset-y-0 right-0 flex items-center px-3 cursor-pointer top-6 text-gray-600 hover:text-gray-900"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
                 {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
               </div>
             )}

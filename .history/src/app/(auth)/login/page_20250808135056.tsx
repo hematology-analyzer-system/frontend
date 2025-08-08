@@ -15,7 +15,6 @@ export default function LoginPage() {
   const [form, setForm] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -80,29 +79,15 @@ export default function LoginPage() {
               className="w-full px-4 py-2 rounded-full bg-gray-100 border border-gray-300 focus:ring-2 focus:ring-blue-400"
               required
             />
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Enter your password"
-                value={form.password}
-                onChange={handleChange}
-                className="w-full px-4 py-2 pr-10 rounded-full bg-gray-100 border border-gray-300 focus:ring-2 focus:ring-blue-400"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(prev => !prev)}
-                className="absolute inset-y-0 right-0 flex items-center px-3 cursor-pointer text-gray-600 hover:text-gray-900"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
-            </div>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              value={form.password}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-full bg-gray-100 border border-gray-300 focus:ring-2 focus:ring-blue-400"
+              required
+            />
             <div className="flex justify-between text-sm text-gray-600">
               <label>
                 <input type="checkbox" className="mr-1" /> Remember me

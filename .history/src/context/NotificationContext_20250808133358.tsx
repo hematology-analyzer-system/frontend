@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import Notification from "@/components/Layout/NotificationBell";
+import type { Notification } from "@/components/Layout/NotificationBell";
 
 interface NotificationContextType {
   notifications: Notification[];
