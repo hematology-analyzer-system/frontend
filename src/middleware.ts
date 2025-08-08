@@ -40,7 +40,13 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Try getting the token from cookies (more reliable than headers in Next.js)
-  const token = request.cookies.get("token")?.value || null;
+  // const token = request.cookies.get("token")?.value || null;
+    const authorizationHeader = request.headers.get("authorization");
+
+  // Check if the header exists and starts with "Bearer "
+  const token = authorizationHeader?.startsWith("Bearer ")
+    ? authorizationHeader.substring(7)
+    : null;
 
   const isProtected = PROTECTED_PATHS.some((path) =>
     pathname.startsWith(path)
