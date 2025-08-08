@@ -79,6 +79,7 @@ export const Navbar: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { notifications } = useNotification();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
