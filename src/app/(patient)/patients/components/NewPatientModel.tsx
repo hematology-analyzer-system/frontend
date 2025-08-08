@@ -24,7 +24,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
     //  const [year, month, day] = dateOfBirth.split('-');
     // const formattedDate = `${year}-${day}-${month}`;
     try {
-      const response = await fetch(`${API_URL}/patients`, {
+      const response = await fetch(`${API_URL}/patients/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
