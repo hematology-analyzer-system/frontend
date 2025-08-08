@@ -1,10 +1,10 @@
 "use client";
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import Notification from "@/components/Layout/NotificationBell";
+import type { NotificationEvent } from "@/type/NotificationEvent";
 
 interface NotificationContextType {
-  notifications: Notification[];
-  setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
+  notifications: NotificationEvent[];
+  setNotifications: React.Dispatch<React.SetStateAction<NotificationEvent[]>>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
