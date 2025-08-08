@@ -32,12 +32,7 @@ const handleCreate = async (id: Number) => {
       alert('Failed to create testorder for patient');
       return;
     }
-  );
-  if (!res.ok) {
-    alert('Failed to create testorder for existing patient');
-    return;
-  }
-  alert('Create testorder successfully');
+    alert('Create testorder successfully');
 };
 
 const PatientTable: FC<Props> = ({ data, reload }) => {
@@ -96,58 +91,29 @@ const PatientTable: FC<Props> = ({ data, reload }) => {
             <td className="p-2">{o.email}</td>
             <td className="p-2">{o.phone}</td>
             <td className="p-2">{o.address}</td>
-            {hasCreatePrivilege && (
-              <td className="p-2">
-                <button
-                  onClick={() => handleCreate(o.id)}
-                  className="px-3 py-1 bg-green-500 text-white rounded hover:bg-blue-700"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          {data.length === 0 ? (
-            <tbody>
-              <tr>
-                <td colSpan={hasCreatePrivilege ? 8 : 7} className="p-8 text-center text-gray-500">
-                  No data
+              {hasCreatePrivilege && (
+                <td className="p-2">
+                  <button
+                    onClick={() => handleCreate(o.id)}
+                    className="button bg-none bg-success w-2/3 px-3 py-1 text-white rounded"
+                  >
+                    Create
+                  </button>
                 </td>
-              </tr>
-            </tbody>
-          ) : (
-            <tbody>
-              {data.map(o => (
-                <tr key={o.id} className="border-t">
-                  <td className="p-2">{o.fullName}</td>
-                  <td className="p-2">{new Date().getFullYear() - new Date(o.dateOfBirth).getFullYear()}</td>
-                  <td className="p-2">{o.gender}</td>
-                  <td className="p-2">{o.email}</td>
-                  <td className="p-2">{o.phone}</td>
-                  <td className="p-2">{o.address}</td>
-                  {hasCreatePrivilege && (
-                    <td className="p-2">
-                      <button
-                        onClick={() => handleCreate(o.id)}
-                        className="button bg-none bg-success w-2/3 px-3 py-1 text-white rounded"
-                      >
-                        Create
-                      </button>
-                    </td>
-                  )}
-                  <td className="p-2">
-                    <Link href={`/patients/${o.id}`}>
-                      <button className="button bg-none bg-primary px-3 py-1 text-white rounded">
-                        View
-                      </button>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          )}
-        </table>
-      </div>
+              )}
+              <td className="p-2">
+                <Link href={`/patients/${o.id}`}>
+                  <button className="button bg-none bg-primary px-3 py-1 text-white rounded">
+                    View
+                  </button>
+                </Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      )}
+          </table>
+        </div>
 
       {/* Modal tạo new patient */}
       {showNew && (
@@ -162,3 +128,4 @@ const PatientTable: FC<Props> = ({ data, reload }) => {
 };
 
 export default PatientTable;
+{/*  */}

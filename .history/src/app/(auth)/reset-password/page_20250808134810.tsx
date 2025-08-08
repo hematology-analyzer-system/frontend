@@ -51,7 +51,7 @@ export default function ResetPasswordPage() {
   };
 
   // Real-time validation handlers
-  const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setNewPassword(value);
     
@@ -67,7 +67,7 @@ export default function ResetPasswordPage() {
     }
   };
 
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setConfirmNewPassword(value);
     
@@ -155,7 +155,7 @@ export default function ResetPasswordPage() {
                 type={showNewPassword ? "text" : "password"}
                 placeholder="Enter your new password"
                 value={newPassword}
-                onChange={handleNewPasswordChange}
+                onChange={(e) => setNewPassword(e.target.value)}
                 className="pr-10 rounded-full bg-yellow-50/50 border-yellow-200"
                 requireField={true}
               />
@@ -182,7 +182,7 @@ export default function ResetPasswordPage() {
                 type={showConfirmNewPassword ? "text" : "password"}
                 placeholder="Confirm new password"
                 value={confirmNewPassword}
-                onChange={handleConfirmPasswordChange}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
                 className="pr-10 rounded-full bg-yellow-50/50 border-yellow-200"
                 requireField={true}
               />
