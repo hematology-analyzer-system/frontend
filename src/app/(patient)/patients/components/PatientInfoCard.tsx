@@ -57,12 +57,7 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
 
   const handleSave = async () => {
     try {
-<<<<<<< Updated upstream
-      
-      const res = await fetch(`http://localhost:8081/patient/patients/${patient.id}`, {
-=======
       const res = await fetch(`https://fhard.khoa.email/api/patients/${patient.id}`, {
->>>>>>> Stashed changes
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -102,8 +97,7 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
   if (!confirmed) return;
 
   try {
-<<<<<<< Updated upstream
-    const testOrderRes = await fetch(`http://localhost:8082/testorder/testorder/filter?searchText=${patient.email}`, {
+    const testOrderRes = await fetch(`https://fhard.khoa.email/api/testorders/filter?searchText=${patient.email}`, {
       method: "GET",
       credentials: 'include'
     });
@@ -125,10 +119,7 @@ export const PatientInfoCard = ({ patient }: { patient: Patient }) => {
       return;
     }
 
-    const res = await fetch(`http://localhost:8081/patient/patients/${patient.id}`, {
-=======
     const res = await fetch(`https://fhard.khoa.email/api/patients/${patient.id}`, {
->>>>>>> Stashed changes
       method: "DELETE",
       credentials: 'include'
     });
