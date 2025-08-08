@@ -285,7 +285,7 @@ export default function UsersPage() {
         <div className="flex justify-end mb-6 mt-4">
           <button
             onClick={handleCreateNewUserClick}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out flex items-center"
+            className="button w-auto text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-100 ease-in-out flex items-center"
           >
             <PlusIcon className="h-5 w-5 mr-2" /> Create New User
           </button>

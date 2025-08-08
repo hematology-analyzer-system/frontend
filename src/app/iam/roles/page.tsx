@@ -272,7 +272,7 @@ export default function RolesPage() {
         <div className="flex justify-end mb-6">
           <button
             onClick={handleCreateRole}
-            className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+            className="button w-auto text-white rounded-lg transition-colors flex items-center"
           >
             <PlusIcon className="h-5 w-5 mr-2" /> Create New Role
           </button>

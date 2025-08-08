@@ -4,6 +4,8 @@ import NotificationItem from "./NotificationItem";
 export default function NotificationDropDown() {
     const { notifications, markAllAsRead, loadNextPage, hasMore, loading } = useNotification();
 
+    console.log(`NotificationDropDown render - displayed notifications: ${notifications.length}, hasMore: ${hasMore}, loading: ${loading}`);
+
     return (
         <div className="absolute right-0 px-3 py-5 w-100 bg-white shadow-2xl rounded-xl z-50 h-auto max-h-[85vh] overflow-y-auto flex flex-col gap-y-2 transition-all">
             <div className="relative flex justify-between items-center mb-3">

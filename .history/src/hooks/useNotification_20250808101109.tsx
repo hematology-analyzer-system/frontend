@@ -409,7 +409,7 @@ export function useNotification() {
         });
 
         // IAM service WebSocket connection for user management notifications
-        const iamSocket = new SockJS("https://fhard.khoa.email/api/iam/ws");
+        const iamSocket = new SockJS("http://localhost:8080/iam/ws");
         const iamClient = new Client({
             webSocketFactory: () => iamSocket,
             onConnect: () => {

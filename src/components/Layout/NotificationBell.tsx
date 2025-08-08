@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import NotificationDropDown from "./NotificationDropDown";
+import NotificationDropDown from "../Notification/NotificationDropDown";
 import { useNotification } from "@/hooks/useNotification";
 import NotificationIcon from "@/assets/icons/NotificationIcon";
 import NotificationOutlineIcon from "@/assets/icons/NotificationOutlineIcon";

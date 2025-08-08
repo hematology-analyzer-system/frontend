@@ -64,7 +64,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4">
-      <div className="relative bg-white rounded-lg border border-teal-500 p-4 w-full sm:w-3/4 md:w-1/2 lg:w-1/3">
+      <div className="relative bg-white rounded-xl p-4 w-full sm:w-3/4 md:w-1/2 lg:w-1/3">
         <button
           type="button"
           onClick={onClose}
@@ -86,7 +86,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
                 onChange={e => setFullName(e.target.value)}
                 placeholder="Nguyen Van A"
                 required
-                className="w-full py-1.5 px-2 rounded-full bg-cyan-100 focus:outline-none text-sm"
+                className="input w-full py-2 rounded-full text-sm"
               />
             </label>
 
@@ -98,7 +98,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
                 value={dateOfBirth}
                 onChange={e => setDateOfBirth(e.target.value)}
                 required
-                className="w-full py-1.5 px-2 rounded-full bg-cyan-100 focus:outline-none text-sm"
+                className="input w-full py-2 rounded-full focus:outline-none text-sm"
               />
             </label>
 
@@ -109,7 +109,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
                 value={gender}
                 onChange={e => setGender(e.target.value as 'MALE' | 'FEMALE')}
                 required
-                className="w-full py-1.5 px-2 rounded-full bg-cyan-100 focus:outline-none text-sm"
+                className="input w-full py-2 rounded-full focus:outline-none text-sm"
               >
                 <option value="MALE">Male</option>
                 <option value="FEMALE">Female</option>
@@ -125,7 +125,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
                 onChange={e => setAddress(e.target.value)}
                 placeholder="Enter your address"
                 required
-                className="w-full py-1.5 px-2 rounded-full bg-cyan-100 focus:outline-none text-sm"
+                className="input w-full py-2 rounded-full focus:outline-none text-sm"
               />
             </label>
 
@@ -138,7 +138,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
                 onChange={e => setPhone(e.target.value)}
                 placeholder="0908070622"
                 required
-                className="w-full py-1.5 px-2 rounded-full bg-cyan-100 focus:outline-none text-sm"
+                className="input w-full py-2 rounded-full focus:outl text-sm"
               />
             </label>
 
@@ -151,7 +151,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="nvb@gmail.com"
                 required
-                className="w-full py-1.5 px-2 rounded-full bg-cyan-100 focus:outline-none text-sm"
+                className="input w-full py-2 rounded-full focus:outline-none text-sm"
               />
             </label>
           </div>
@@ -159,7 +159,7 @@ export default function NewPatientModel({ onClose, onCreated }: Props) {
           <div className="flex justify-end mt-4">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700"
+              className="button max-w-[200px] text-white rounded-full text-sm"
             >
               Create &amp; Save
             </button>

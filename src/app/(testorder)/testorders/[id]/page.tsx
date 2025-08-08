@@ -215,7 +215,7 @@ export default function TestOrderDetailPage() {
           /* Nếu đã completed: show View Results */
           <button
             onClick={handleGenerate}
-            className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="button bg-none bg-success text-white rounded-lg"
           >
             Gen Results
           </button>
@@ -224,14 +224,14 @@ export default function TestOrderDetailPage() {
           
           <button
             onClick={handleViewResults}
-            className="px-5 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+            className="button text-white rounded"
           >
             View Results
           </button>
         )}
             {hasDeletePrivilege && (<button
               onClick={handleDelete}
-              className="px-5 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              className="button bg-none bg-danger text-white rounded-lg"
             >Delete</button>)}
           </div>
         </div>
@@ -279,7 +279,7 @@ export default function TestOrderDetailPage() {
 
           {hasAddCommentPrivilege && (<button
             onClick={() => setAdding(true)}
-            className="mt-2 px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="button w-2/3 text-white rounded-lg"
           >
             Add comment
           </button>)}
@@ -289,18 +289,18 @@ export default function TestOrderDetailPage() {
       {/* Modal Add Comment */}
       {adding && (
         <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50">
-          <div className="relative bg-white rounded-lg border border-teal-500 p-6 w-[90%] max-w-lg">
+          <div className="relative bg-white rounded-xl p-6 w-[90%] max-w-lg">
             {/* Close icon */}
             <button
               onClick={() => setAdding(false)}
-              className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-200"
+              className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-200 cursor-pointer"
             >
               <X size={24} />
             </button>
 
-            <h3 className="text-2xl mb-4">Add comment</h3>
+            <h3 className="text-title font-semibold mb-5">Add comment</h3>
             {/* Khối textarea background nhạt */}
-            <div className="bg-cyan-100 rounded-lg p-4 h-40">
+            <div className="bg-background-light rounded-xl p-4 h-40">
               <textarea
                 value={commentText}
                 onChange={e => setText(e.target.value)}
@@ -310,10 +310,10 @@ export default function TestOrderDetailPage() {
             </div>
 
             {/* Create & Save */}
-            <div className="flex justify-end mt-6">
+            <div className="flex justify-center mt-6">
               <button
                 onClick={handleSaveComment}
-                className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="button w-2/3 text-white rounded-full"
               >
                 Create &amp; Save
               </button>

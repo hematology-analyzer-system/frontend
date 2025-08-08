@@ -127,7 +127,7 @@ const UserForm: React.FC<UserFormProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6">
-      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+      <div className="relative bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-y-auto grid grid-cols-1 md:grid-cols-2">
         {/* Left Section: User Details Form */}
         <div className="p-8 bg-white">
           <div className="flex items-center justify-between mb-6">
@@ -259,7 +259,7 @@ const UserForm: React.FC<UserFormProps> = ({
             <div className="flex gap-4 pt-4">
               <button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-2 px-4 rounded-full shadow-md hover:from-blue-500 hover:to-blue-600 transition"
+                className="flex-1 bg-gradient-to-r button text-white font-semibold py-2 px-4 rounded-full shadow-md transition"
                 disabled={submitLoading}
               >
                 {submitLoading ? "Saving..." : (user ? "Update User" : "Create User")}
@@ -267,7 +267,7 @@ const UserForm: React.FC<UserFormProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 border border-gray-400 text-gray-700 font-medium py-2 px-4 rounded-full hover:bg-gray-50 transition"
+                className="flex-1 border outline-button font-medium py-2 px-4 rounded-fulltransition"
                 disabled={submitLoading}
               >
                 Cancel

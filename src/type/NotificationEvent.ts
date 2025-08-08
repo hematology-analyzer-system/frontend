@@ -4,7 +4,7 @@ export interface NotificationEvent {
   eventId: string;
 
   entityType: string;
-  entityid: string;
+  entityId: string;
 
   action: string;
 

@@ -33,6 +33,7 @@ const TestOrderTable: FC<Props> = ({ data, reload }) => {
 
       {/* Bảng Test Orders */}
       <div className="p-4 overflow-auto">
+<<<<<<< HEAD
        <table className="min-w-full bg-white rounded-lg shadow">
   <thead className="bg-gray-100">
     <tr>
@@ -88,6 +89,63 @@ const TestOrderTable: FC<Props> = ({ data, reload }) => {
     )}
   </tbody>
 </table>
+=======
+        <table className="min-w-full bg-white rounded-lg shadow overflow-hidden">
+          <thead className="bg-background-light">
+            <tr>
+              {/* <th className="p-2"><input type="checkbox" /></th> */}
+              {['Patient name', 'Age', 'Gender', 'Phone', 'Status', 'Create by', 'Run date', 'Run by', 'View'].map(h => (
+                <th
+                  key={h}
+                  className="p-2 text-center text-sm font-medium text-gray-600"
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          {data.length === 0 ? (
+            <tbody>
+              <tr>
+                <td colSpan={9} className="p-8 text-center text-gray-500">
+                  No data
+                </td>
+              </tr>
+            </tbody>
+          ) : (
+            <tbody>
+              {data.map(o => (
+                <tr key={o.id} className="border-t">
+                  <td className="p-2">{o.fullName}</td>
+                  <td className="p-2">{o.age}</td>
+                  <td className="p-2">{o.gender}</td>
+                  <td className="p-2">{o.phone}</td>
+                  <td
+                    className={`p-2 ${o.status.toLowerCase() === 'completed'
+                        ? 'text-green-600'
+                        : o.status.toLowerCase() === 'reviewed'
+                          ? 'text-blue-600'
+                          : 'text-orange-500'
+                      }`}
+                  >
+                    {o.status.toLowerCase()}
+                  </td>
+                  <td className="p-2">{extractIdNum(o.createdBy) || '-'}</td>
+                  <td className="p-2">{new Date(o.runAt).toLocaleDateString()}</td>
+                  <td className="p-2">{extractIdNum(o.runBy) || '-'}</td>
+                  <td className="p-2">
+                    <Link href={`/testorders/${o.id}`}>
+                      <button className="button bg-primary w-2/3 px-3 py-1 text-white rounded">
+                        View
+                      </button>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          )}
+        </table>
+>>>>>>> 21aa4e97fbb97a9e3894f5b4e5b94c0675b1cb25
       </div>
 
       {/* Modal tạo new patient */}
