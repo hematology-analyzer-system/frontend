@@ -12,7 +12,7 @@ const Header: FC<Props> = ({ onNew }) => {
 
   return (
     <div className="flex justify-between items-center p-4">
-      <div className="flex items-center space-x-3">
+      {/* <div className="flex items-center space-x-3">
         <button
           onClick={onNew}
           className="button flex items-center text-white px-4 py-2 rounded-lg"
@@ -20,7 +20,7 @@ const Header: FC<Props> = ({ onNew }) => {
           <Plus className="mr-2" />New patient
         </button>
         
-      </div>
+      </div> */}
       <div className="flex items-center space-x-3">
         <button
           onClick={() => setDark(!dark)}
