@@ -49,7 +49,8 @@ export function middleware(request: NextRequest) {
     : null;
 
   const isProtected = PROTECTED_PATHS.some((path) =>
-    pathname.startsWith(path)
+    // pathname.startsWith(path)
+  request.nextUrl.pathname.startsWith(path)
   );
 
   // If logged in and trying to access login page → redirect to profile
