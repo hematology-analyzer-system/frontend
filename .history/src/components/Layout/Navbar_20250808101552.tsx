@@ -73,13 +73,9 @@ import { UserCircleIcon } from "@heroicons/react/24/solid";
 import React from "react";
 import NotificationBell from "./NotificationBell";
 import { useNotification } from "@/context/NotificationContext";
-import { useRouter } from "next/navigation";
 
 export const Navbar: React.FC = () => {
   const [fullName, setFullName] = useState<string | null>(null);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
   const { notifications } = useNotification();
 
   useEffect(() => {
@@ -154,11 +150,11 @@ export const Navbar: React.FC = () => {
             </div>
           )}
         </div>
-      {/* <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4">
         <NotificationBell notifications={notifications} />
         <UserCircleIcon className="h-6 w-6 text-black" />
         <span className="text-sm font-medium">{fullName}</span>
-      </div> */}
+      </div>
     </div>
   );
-}
+};

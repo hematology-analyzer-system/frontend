@@ -20,6 +20,8 @@ export function useNotification() {
 
     const [loading, setLoading] = useState(false);
 
+<<<<<<< HEAD
+=======
     const [open, setOpen] = useState(false);
 
     // Load IAM notifications from localStorage on mount
@@ -101,19 +103,27 @@ export function useNotification() {
     //     }
     // };
 
+>>>>>>> d38a6574ccf9ebe9f867c8f2813bcbb3902bd1ab
     const fetchPageNotifications = async (pageNumber: number) => {
         try {
             setLoading(true);
 
+<<<<<<< HEAD
+            const res = await fetch(`https://fhard.khoa.email/api/patients/notifications/paging?page=${pageNumber}&size=4`, {
+                credentials: "include"
+            });
+            const data = await res.json();
+=======
             // Fetch from both services in parallel
             const [iamResponse, patientResponse] = await Promise.allSettled([
-                fetch(`https://fhard.khoa.email/api/iam/notifications/paging?page=${pageNumber}&size=5`, {
+                fetch(`http://localhost:8080/iam/notifications/paging?page=${pageNumber}&size=5`, {
                     credentials: "include"
                 }),
-                fetch(`https://fhard.khoa.email/api/patients/notifications/paging?page=${pageNumber}&size=5`, {
+                fetch(`http://localhost:8081/patient/notifications/paging?page=${pageNumber}&size=5`, {
                     credentials: "include"
                 })
             ]);
+>>>>>>> d38a6574ccf9ebe9f867c8f2813bcbb3902bd1ab
 
             let allNewNotifications: any[] = [];
             let hasMoreIam = false;
@@ -199,12 +209,19 @@ export function useNotification() {
     // Helper function to calculate total unread count
     const calculateUnreadCount = async () => {
         try {
+<<<<<<< HEAD
+            const res = await fetch("https://fhard.khoa.email/api/patients/notifications/unread-count", {
+                credentials: "include",
+            });
+            const data = await res.json();
+            setUnreadCount(data);
+=======
             // Get unread count from both services in parallel
             const [iamResponse, patientResponse] = await Promise.allSettled([
-                fetch("https://fhard.khoa.email/api/iam/notifications/unread-count", {
+                fetch("http://localhost:8080/iam/notifications/unread-count", {
                     credentials: "include",
                 }),
-                fetch("https://fhard.khoa.email/api/patients/notifications/unread-count", {
+                fetch("http://localhost:8081/patient/notifications/unread-count", {
                     credentials: "include",
                 })
             ]);
@@ -241,6 +258,7 @@ export function useNotification() {
             
             setUnreadCount(totalUnreadCount);
             return totalUnreadCount;
+>>>>>>> d38a6574ccf9ebe9f867c8f2813bcbb3902bd1ab
         } catch (err: any) {
             console.log("Error in calculating unread count");
             throw err;
@@ -253,6 +271,14 @@ export function useNotification() {
 
     const markAsRead = async (id: string) => {
         try {
+<<<<<<< HEAD
+            await fetch(`https://fhard.khoa.email/api/patients/notifications/${id}/read`, {
+                method: "PUT",
+                credentials: "include",
+            });
+            fetchPageNotifications(page);
+            fetchUnreadCount();
+=======
             // Check if it's an in-memory IAM notification (for backward compatibility)
             const isInMemoryIamNotification = inMemoryNotifications.some(n => n.id === id);
             
@@ -285,11 +311,11 @@ export function useNotification() {
             } else {
                 // Try to mark as read in both services (we don't know which service owns this notification)
                 const [iamResponse, patientResponse] = await Promise.allSettled([
-                    fetch(`https://fhard.khoa.email/api/iam/notifications/${id}/read`, {
+                    fetch(`http://localhost:8080/iam/notifications/${id}/read`, {
                         method: "PUT",
                         credentials: "include",
                     }),
-                    fetch(`https://fhard.khoa.email/api/patients/notifications/${id}/read`, {
+                    fetch(`http://localhost:8081/patient/notifications/${id}/read`, {
                         method: "PUT",
                         credentials: "include",
                     })
@@ -314,6 +340,7 @@ export function useNotification() {
                     );
                 }
             }
+>>>>>>> d38a6574ccf9ebe9f867c8f2813bcbb3902bd1ab
         } catch (err: any) {
             console.log("Error in mark an event read")
             throw err;
@@ -322,13 +349,18 @@ export function useNotification() {
 
     const markAllAsRead = async () => {
         try {
+<<<<<<< HEAD
+            await fetch(`https://fhard.khoa.email/api/patients/notifications/mark-all-read`, {
+                method: "PUT",
+                credentials: "include",
+=======
             // Try to mark all notifications as read in both services
             const [iamResponse, patientResponse] = await Promise.allSettled([
-                fetch(`https://fhard.khoa.email/api/iam/notifications/mark-all-read`, {
+                fetch(`http://localhost:8080/iam/notifications/mark-all-read`, {
                     method: "PUT",
                     credentials: "include",
                 }),
-                fetch(`https://fhard.khoa.email/api/patients/notifications/mark-all-read`, {
+                fetch(`http://localhost:8081/patient/notifications/mark-all-read`, {
                     method: "PUT",
                     credentials: "include",
                 })
@@ -356,6 +388,7 @@ export function useNotification() {
                     console.error('Error updating IAM notifications in localStorage:', e);
                 }
                 return updated;
+>>>>>>> d38a6574ccf9ebe9f867c8f2813bcbb3902bd1ab
             });
             
             // Update the combined notifications
@@ -388,10 +421,16 @@ export function useNotification() {
         
         initializeNotifications();
 
+<<<<<<< HEAD
+        const socket = new SockJS("https://fhard.khoa.email/api/patients/ws");
+        const client = new Client({
+            webSocketFactory: () => socket,
+=======
         // Patient service WebSocket connection
-        const patientSocket = new SockJS("https://fhard.khoa.email/api/patients/ws");
+        const patientSocket = new SockJS("http://localhost:8081/patient/ws");
         const patientClient = new Client({
             webSocketFactory: () => patientSocket,
+>>>>>>> d38a6574ccf9ebe9f867c8f2813bcbb3902bd1ab
             onConnect: () => {
                 console.log("Connected to patient service WebSocket");
                 patientClient.subscribe("/topic/notification", (message) => {
@@ -409,7 +448,7 @@ export function useNotification() {
         });
 
         // IAM service WebSocket connection for user management notifications
-        const iamSocket = new SockJS("https://fhard.khoa.email/api/iam/ws");
+        const iamSocket = new SockJS("http://localhost:8080/iam/ws");
         const iamClient = new Client({
             webSocketFactory: () => iamSocket,
             onConnect: () => {

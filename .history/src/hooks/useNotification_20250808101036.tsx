@@ -201,10 +201,10 @@ export function useNotification() {
         try {
             // Get unread count from both services in parallel
             const [iamResponse, patientResponse] = await Promise.allSettled([
-                fetch("https://fhard.khoa.email/api/iam/notifications/unread-count", {
+                fetch("http://localhost:8080/iam/notifications/unread-count", {
                     credentials: "include",
                 }),
-                fetch("https://fhard.khoa.email/api/patients/notifications/unread-count", {
+                fetch("http://localhost:8081/patient/notifications/unread-count", {
                     credentials: "include",
                 })
             ]);
@@ -285,11 +285,11 @@ export function useNotification() {
             } else {
                 // Try to mark as read in both services (we don't know which service owns this notification)
                 const [iamResponse, patientResponse] = await Promise.allSettled([
-                    fetch(`https://fhard.khoa.email/api/iam/notifications/${id}/read`, {
+                    fetch(`http://localhost:8080/iam/notifications/${id}/read`, {
                         method: "PUT",
                         credentials: "include",
                     }),
-                    fetch(`https://fhard.khoa.email/api/patients/notifications/${id}/read`, {
+                    fetch(`http://localhost:8081/patient/notifications/${id}/read`, {
                         method: "PUT",
                         credentials: "include",
                     })
@@ -324,11 +324,11 @@ export function useNotification() {
         try {
             // Try to mark all notifications as read in both services
             const [iamResponse, patientResponse] = await Promise.allSettled([
-                fetch(`https://fhard.khoa.email/api/iam/notifications/mark-all-read`, {
+                fetch(`http://localhost:8080/iam/notifications/mark-all-read`, {
                     method: "PUT",
                     credentials: "include",
                 }),
-                fetch(`https://fhard.khoa.email/api/patients/notifications/mark-all-read`, {
+                fetch(`http://localhost:8081/patient/notifications/mark-all-read`, {
                     method: "PUT",
                     credentials: "include",
                 })
@@ -389,7 +389,7 @@ export function useNotification() {
         initializeNotifications();
 
         // Patient service WebSocket connection
-        const patientSocket = new SockJS("https://fhard.khoa.email/api/patients/ws");
+        const patientSocket = new SockJS("http://localhost:8081/patient/ws");
         const patientClient = new Client({
             webSocketFactory: () => patientSocket,
             onConnect: () => {
@@ -409,7 +409,7 @@ export function useNotification() {
         });
 
         // IAM service WebSocket connection for user management notifications
-        const iamSocket = new SockJS("https://fhard.khoa.email/api/iam/ws");
+        const iamSocket = new SockJS("http://localhost:8080/iam/ws");
         const iamClient = new Client({
             webSocketFactory: () => iamSocket,
             onConnect: () => {

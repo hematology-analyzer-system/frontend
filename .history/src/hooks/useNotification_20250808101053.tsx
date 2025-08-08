@@ -324,11 +324,11 @@ export function useNotification() {
         try {
             // Try to mark all notifications as read in both services
             const [iamResponse, patientResponse] = await Promise.allSettled([
-                fetch(`https://fhard.khoa.email/api/iam/notifications/mark-all-read`, {
+                fetch(`http://localhost:8080/iam/notifications/mark-all-read`, {
                     method: "PUT",
                     credentials: "include",
                 }),
-                fetch(`https://fhard.khoa.email/api/patients/notifications/mark-all-read`, {
+                fetch(`http://localhost:8081/patient/notifications/mark-all-read`, {
                     method: "PUT",
                     credentials: "include",
                 })
@@ -389,7 +389,7 @@ export function useNotification() {
         initializeNotifications();
 
         // Patient service WebSocket connection
-        const patientSocket = new SockJS("https://fhard.khoa.email/api/patients/ws");
+        const patientSocket = new SockJS("http://localhost:8081/patient/ws");
         const patientClient = new Client({
             webSocketFactory: () => patientSocket,
             onConnect: () => {
@@ -409,7 +409,7 @@ export function useNotification() {
         });
 
         // IAM service WebSocket connection for user management notifications
-        const iamSocket = new SockJS("https://fhard.khoa.email/api/iam/ws");
+        const iamSocket = new SockJS("http://localhost:8080/iam/ws");
         const iamClient = new Client({
             webSocketFactory: () => iamSocket,
             onConnect: () => {
