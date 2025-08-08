@@ -413,6 +413,8 @@ export function useNotification() {
         const iamClient = new Client({
             webSocketFactory: () => iamSocket,
             onConnect: () => {
+                console.log("Connected to IAM service WebSocket");
+                
                 // User locked notifications
                 iamClient.subscribe("/topic/userLocked", (message) => {
                     if (message.body) {
