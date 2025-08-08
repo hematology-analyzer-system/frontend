@@ -54,7 +54,7 @@ export default function UserProfilePage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`http://localhost:8080/iam/users/${id}`, {
+      const res = await fetch(`https://fhard.khoa.email/api/iam/users/${id}`, {
         method: 'GET',
         credentials: 'include',
       });
